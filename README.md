@@ -3,7 +3,7 @@
 
 A spreadsheet component for React
 
-![SouTable](./SouTable.png?raw=true "SouTable")
+![SouTable](./screenshot.png?raw=true "SouTable")
 
 ## Features
 
