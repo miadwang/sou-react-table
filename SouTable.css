@@ -1,13 +1,17 @@
 * {
     box-sizing: border-box;
 }
-.sou-table {
-    border-collapse: collapse;
-    text-align: left;
+
+.sou-table-wrapper {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", SimSun, sans-serif;
     font-size: 12px;
     line-height: 18px;
     color: rgba(0, 0, 0, 0.65098);
+}
+
+.sou-table {
+    border-collapse: collapse;
+    text-align: left;
 }
 
 .sou-table > thead,

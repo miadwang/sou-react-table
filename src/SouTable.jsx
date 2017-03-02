@@ -1189,7 +1189,7 @@ class SouTable extends Component {
 
   render() {
     return (
-      <div>
+      <div className="sou-table-wrapper">
         {this.renderTable()}
         {this.renderBorders()}
         {this.renderContext()}
