@@ -1,5 +1,4 @@
 import React, { Component, PropTypes } from 'react';
-import './SouTable.css';
 
 class SouTable extends Component {
 
@@ -963,149 +962,6 @@ class SouTable extends Component {
         </div>}
       </div>
     );
-
-    // return (
-    //   <div
-    //     className="sou-borders"
-    //     onMouseDown={(e) => e.preventDefault()}
-    //     onMouseUp={this.onMouseUp}
-    //     onContextMenu={(e) => e.preventDefault()}
-    //   >
-    //     {dragColIndex !== undefined && <div className="sou-paste-borders">
-    //       <div
-    //         style={{
-    //           top: autoPasteOffsetTop + 'px',
-    //           left: autoPasteOffsetLeft + 'px',
-    //           width: autoPasteOffsetWidth + 'px',
-    //           height: '1px',
-    //         }}
-    //       />
-    //
-    //       <div
-    //         style={{
-    //           top: autoPasteOffsetTop + 'px',
-    //           left: (autoPasteOffsetLeft + autoPasteOffsetWidth) + 'px',
-    //           width: '1px',
-    //           height: autoPasteOffsetHeight + 'px',
-    //         }}
-    //       />
-    //
-    //       <div
-    //         style={{
-    //           top: (autoPasteOffsetTop + autoPasteOffsetHeight) + 'px',
-    //           left: autoPasteOffsetLeft + 'px',
-    //           width: autoPasteOffsetWidth + 'px',
-    //           height: '1px',
-    //         }}
-    //       />
-    //
-    //       <div
-    //         style={{
-    //           top: autoPasteOffsetTop + 'px',
-    //           left: autoPasteOffsetLeft + 'px',
-    //           width: '1px',
-    //           height: autoPasteOffsetHeight + 'px',
-    //         }}
-    //       />
-    //     </div>}
-    //
-    //     {endColIndex !== undefined && <div className="sou-area-borders">
-    //       <div
-    //         style={{
-    //           top: multiSelectOffsetTop + 'px',
-    //           left: multiSelectOffsetLeft + 'px',
-    //           width: multiSelectOffsetWidth + 'px',
-    //           height: '1px',
-    //         }}
-    //       />
-    //
-    //       <div
-    //         style={{
-    //           top: multiSelectOffsetTop + 'px',
-    //           left: (multiSelectOffsetLeft + multiSelectOffsetWidth) + 'px',
-    //           width: '1px',
-    //           height: multiSelectOffsetHeight + 'px',
-    //         }}
-    //       />
-    //
-    //       <div
-    //         style={{
-    //           top: (multiSelectOffsetTop + multiSelectOffsetHeight) + 'px',
-    //           left: multiSelectOffsetLeft + 'px',
-    //           width: multiSelectOffsetWidth + 'px',
-    //           height: '1px',
-    //         }}
-    //       />
-    //
-    //       <div
-    //         style={{
-    //           top: multiSelectOffsetTop + 'px',
-    //           left: multiSelectOffsetLeft + 'px',
-    //           width: '1px',
-    //           height: multiSelectOffsetHeight + 'px',
-    //         }}
-    //       />
-    //
-    //       <div
-    //         className="sou-drag-grip"
-    //         style={{
-    //           top: (multiSelectOffsetTop + multiSelectOffsetHeight - 4) + 'px',
-    //           left: (multiSelectOffsetLeft + multiSelectOffsetWidth - 4) + 'px',
-    //           display: this.state.isTyping ? 'none' : 'initial',
-    //         }}
-    //         onMouseDown={this.onGripMouseDown}
-    //       />
-    //     </div>}
-    //
-    //     <div className="sou-current-borders">
-    //       <div
-    //         style={{
-    //           top: offsetTop + 'px',
-    //           left: offsetLeft + 'px',
-    //           width: offsetWidth + 'px',
-    //           height: '2px',
-    //         }}
-    //       />
-    //
-    //       <div
-    //         style={{
-    //           top: offsetTop + 'px',
-    //           left: (offsetLeft + offsetWidth - 1) + 'px',
-    //           width: '2px',
-    //           height: offsetHeight + 'px',
-    //         }}
-    //       />
-    //
-    //       <div
-    //         style={{
-    //           top: (offsetTop + offsetHeight - 1) + 'px',
-    //           left: offsetLeft + 'px',
-    //           width: offsetWidth + 'px',
-    //           height: '2px',
-    //         }}
-    //       />
-    //
-    //       <div
-    //         style={{
-    //           top: offsetTop + 'px',
-    //           left: offsetLeft + 'px',
-    //           width: '2px',
-    //           height: offsetHeight + 'px',
-    //         }}
-    //       />
-    //
-    //       {endColIndex === undefined && <div
-    //         className="sou-drag-grip"
-    //         style={{
-    //           top: (offsetTop + offsetHeight - 4) + 'px',
-    //           left: (offsetLeft + offsetWidth - 4) + 'px',
-    //           display: this.state.isTyping ? 'none' : 'initial',
-    //         }}
-    //         onMouseDown={this.onGripMouseDown}
-    //       />}
-    //     </div>
-    //   </div>
-    // );
   }
 
   styleBorders() {
@@ -1240,21 +1096,21 @@ class SouTable extends Component {
           key="1"
           onClick={this.copy}
         >
-          <span>复制</span>
+          <span>Copy</span>
         </li>
 
         <li
           key="2"
           onClick={this.cut}
         >
-          <span>剪切</span>
+          <span>Cut</span>
         </li>
 
         <li
           key="3"
           onClick={this.paste}
         >
-          <span>粘贴</span>
+          <span>Paste</span>
         </li>
 
         <div key="d1" className="divider" />
@@ -1263,21 +1119,21 @@ class SouTable extends Component {
           key="4"
           onClick={this.insertRow(0)}
         >
-          <span>在上方插入行</span>
+          <span>Insert row above</span>
         </li>
 
         <li
           key="5"
           onClick={this.insertRow(1)}
         >
-          <span>在下方插入行</span>
+          <span>Insert row below</span>
         </li>
 
         <li
           key="6"
           onClick={this.deleteRow}
         >
-          <span>删除行</span>
+          <span>Delete row</span>
         </li>
 
         <div key="d2" className="divider" />
@@ -1286,21 +1142,21 @@ class SouTable extends Component {
           key="7"
           onClick={this.insertCol(0)}
         >
-          <span>在左侧插入列</span>
+          <span>Insert column left</span>
         </li>
 
         <li
           key="8"
           onClick={this.insertCol(1)}
         >
-          <span>在右侧插入列</span>
+          <span>Insert column right</span>
         </li>
 
         <li
           key="9"
           onClick={this.deleteCol}
         >
-          <span>删除列</span>
+          <span>Delete Column</span>
         </li>
 
         <div key="d3" className="divider" />
@@ -1309,7 +1165,7 @@ class SouTable extends Component {
           key="10"
           onClick={this.clearCells}
         >
-          <span>清空所选</span>
+          <span>Clear</span>
         </li>
 
         <div key="d4" className="divider" />
@@ -1318,14 +1174,14 @@ class SouTable extends Component {
           key="11"
           onClick={this.sort()}
         >
-          <span>A-Z 排序</span>
+          <span>Sort A-Z</span>
         </li>
 
         <li
           key="12"
           onClick={this.sort(true)}
         >
-          <span>Z-A 排序</span>
+          <span>Sort Z-A</span>
         </li>
       </ul>
     );
@@ -1333,7 +1189,7 @@ class SouTable extends Component {
 
   render() {
     return (
-      <div className="sou-table">
+      <div>
         {this.renderTable()}
         {this.renderBorders()}
         {this.renderContext()}
