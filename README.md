@@ -34,7 +34,7 @@ You'll need to install React and ReactDOM separately since they are not included
 
 ```js
 import SouTable from 'sou-react-table';
-import SouTable.css from 'sou-react-table';
+import 'sou-react-table/SouTable.css';
 
 <SouTable
   tableData = [
