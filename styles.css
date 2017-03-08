@@ -300,7 +300,7 @@ a:hover { text-decoration: underline; }
 .main-content blockquote { padding: 0 1rem; margin-left: 0; color: #819198; border-left: 0.3rem solid #dce6f0; }
 .main-content blockquote > :first-child { margin-top: 0; }
 .main-content blockquote > :last-child { margin-bottom: 0; }
-.main-content table { display: block; width: 100%; overflow: auto; word-break: normal; word-break: keep-all; -webkit-overflow-scrolling: touch; }
+.main-content table { overflow: auto; word-break: normal; word-break: keep-all; -webkit-overflow-scrolling: touch; }
 .main-content table th { font-weight: bold; }
 .main-content table th, .main-content table td { padding: 0.5rem 1rem; border: 1px solid #e9ebec; }
 .main-content dl { padding: 0; }
