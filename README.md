@@ -1,7 +1,7 @@
 
 # Sou React Table
 
-A spreadsheet component for React
+A spreadsheet component for React ([Demo](https://miadwang.github.io/sou-react-table/))
 
 ![SouTable](./screenshot.png?raw=true "SouTable")
 
