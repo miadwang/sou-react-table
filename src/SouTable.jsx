@@ -80,10 +80,10 @@ class SouTable extends Component {
   onContextMenu(e) {
     e.preventDefault();
     const target = e.target;
-    const wrapperRect = this.wrapper.getBoundingClientRect();
+    const tableRect = e.currentTarget.getBoundingClientRect();
     let contextMenuState = {
-      xPos: e.clientX - wrapperRect.left,
-      yPos: e.clientY - wrapperRect.top,
+      xPos: e.clientX - tableRect.left,
+      yPos: e.clientY - tableRect.top,
       isContextMenuHidden: false,
     };
     if (target.tagName === 'TD' || target.tagName === 'TH') {
@@ -1193,10 +1193,7 @@ class SouTable extends Component {
 
   render() {
     return (
-      <div
-        className="sou-table-wrapper"
-        ref={wrapper => this.wrapper = wrapper}
-      >
+      <div className="sou-table-wrapper">
         {this.renderTable()}
       </div>
     );

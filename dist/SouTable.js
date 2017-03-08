@@ -121,10 +121,10 @@ var SouTable = function (_Component) {
     value: function onContextMenu(e) {
       e.preventDefault();
       var target = e.target;
-      var wrapperRect = this.wrapper.getBoundingClientRect();
+      var tableRect = e.currentTarget.getBoundingClientRect();
       var contextMenuState = {
-        xPos: e.clientX - wrapperRect.left,
-        yPos: e.clientY - wrapperRect.top,
+        xPos: e.clientX - tableRect.left,
+        yPos: e.clientY - tableRect.top,
         isContextMenuHidden: false
       };
       if (target.tagName === 'TD' || target.tagName === 'TH') {
@@ -1458,16 +1458,9 @@ var SouTable = function (_Component) {
   }, {
     key: 'render',
     value: function render() {
-      var _this8 = this;
-
       return _react2.default.createElement(
         'div',
-        {
-          className: 'sou-table-wrapper',
-          ref: function ref(wrapper) {
-            return _this8.wrapper = wrapper;
-          }
-        },
+        { className: 'sou-table-wrapper' },
         this.renderTable()
       );
     }
