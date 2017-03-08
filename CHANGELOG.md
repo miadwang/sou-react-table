@@ -1,3 +1,10 @@
+## 0.1.3
+
+`2017-3-8`
+
+- Fix bug: wrong position of context menu and borders
+- Add demo in [project website](https://miadwang.github.io/sou-react-table)
+
 ## 0.1.2
 
 `2017-3-3`

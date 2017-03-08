@@ -1,2 +1,6 @@
 src
 .babelrc
+.idex
+.config.yml
+.scripts
+.storybook
