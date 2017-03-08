@@ -1,6 +1,6 @@
 src
 .babelrc
-.idex
+.idea
 .config.yml
 .scripts
 .storybook
