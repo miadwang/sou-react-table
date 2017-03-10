@@ -54,10 +54,17 @@ class SouTable extends Component {
     this.getSwitchedTableData = this.getSwitchedTableData.bind(this);
     this.switchColRow = this.switchColRow.bind(this);
     this.sort = this.sort.bind(this);
-    this.renderTable = this.renderTable.bind(this);
+    this.onRowIndicatorColScroll = this.onRowIndicatorColScroll.bind(this);
+    this.onColIndicatorRowScroll = this.onColIndicatorRowScroll.bind(this);
+    this.onInnerTableScroll = this.onInnerTableScroll.bind(this);
+    this.styleTable = this.styleTable.bind(this);
     this.renderBorders = this.renderBorders.bind(this);
     this.styleBorders = this.styleBorders.bind(this);
     this.renderContext = this.renderContext.bind(this);
+  }
+
+  componentDidMount() {
+    this.styleTable();
   }
 
   componentWillReceiveProps(nextProps) {
@@ -73,6 +80,7 @@ class SouTable extends Component {
 
   componentDidUpdate() {
     if (this.state.colIndex !== undefined) {
+      this.styleTable();
       this.styleBorders();
     }
   }
@@ -80,10 +88,10 @@ class SouTable extends Component {
   onContextMenu(e) {
     e.preventDefault();
     const target = e.target;
-    const tableRect = e.currentTarget.getBoundingClientRect();
+    const wrapperRect = this.wrapper.getBoundingClientRect();
     let contextMenuState = {
-      xPos: e.clientX - tableRect.left,
-      yPos: e.clientY - tableRect.top,
+      xPos: e.clientX - wrapperRect.left,
+      yPos: e.clientY - wrapperRect.top,
       isContextMenuHidden: false,
     };
     if (target.tagName === 'TD' || target.tagName === 'TH') {
@@ -813,48 +821,67 @@ class SouTable extends Component {
     };
   }
 
+  onRowIndicatorColScroll() {
+    this.innerTable.scrollTop = this.rowIndicatorCol.scrollTop;
+  }
+
+  onColIndicatorRowScroll() {
+    this.innerTable.scrollLeft = this.colIndicatorRow.scrollLeft;
+  }
+
+  onInnerTableScroll() {
+    this.rowIndicatorCol.scrollTop = this.innerTable.scrollTop;
+    this.colIndicatorRow.scrollLeft = this.innerTable.scrollLeft;
+  }
+
   renderTable() {
     let { tableData, tableCol, tableRow, colIndex, rowIndex, endColIndex, endRowIndex } = this.state;
-    const ths = [];
-    ths.push(
-      <th
-        key={0}
-        data-col={-1}
-        data-row={-1}
-        onClick={this.switchColRow}
-      >
-        switch
-      </th>
-    );
-    for (let i = 1; i <= tableCol; i++) {
-      const isColIncluded = endColIndex !== undefined ? (i - 1 >= Math.min(colIndex, endColIndex)
-      && i - 1 <= Math.max(colIndex, endColIndex)) : (i - 1 === colIndex);
-      ths.push(
-        <th
-          key={i}
-          data-col={i - 1}
-          data-row={-1}
-          className={isColIncluded ? 'sou-selected-cell-indicator' : ''}
-        >
-          {String.fromCharCode(i + 64)}
-        </th>
-      );
-    }
-    const rows = [];
+    const { width, height, cellMinWidth, cellHeight } = this.props;
+    const cellStyle = {
+      minWidth: cellMinWidth + 'px',
+      height: cellHeight + 'px',
+    };
+    const firstColRows = [];
     for (let j = 0; j < tableRow; j++) {
       const isRowIncluded = endRowIndex !== undefined ? (j >= Math.min(rowIndex, endRowIndex)
       && j <= Math.max(rowIndex, endRowIndex)) : (j === rowIndex);
-      let row = (
+      firstColRows.push(
         <tr key={j}>
           <td
-            key={0}
+            style={cellStyle}
             data-col={-1}
             data-row={j}
             className={isRowIncluded ? 'sou-selected-cell-indicator' : ''}
           >
             {j}
           </td>
-          {ths.slice(1).map((col, index) => {
+        </tr>
+      );
+    }
+
+    const ths = [];
+    for (let i = 1; i <= tableCol; i++) {
+      const isColIncluded = endColIndex !== undefined ? (i - 1 >= Math.min(colIndex, endColIndex)
+      && i - 1 <= Math.max(colIndex, endColIndex)) : (i - 1 === colIndex);
+      ths.push(
+        <th
+          key={i}
+          style={cellStyle}
+          data-col={i - 1}
+          data-row={-1}
+          className={isColIncluded ? 'sou-selected-cell-indicator' : ''}
+        >
+          {i > 26 && String.fromCharCode(Math.floor((i - 1) / 26) + 64)}
+          {String.fromCharCode((i - 1) % 26 + 65)}
+        </th>
+      );
+    }
+
+    const rows = [];
+    for (let j = 0; j < tableRow; j++) {
+      let row = (
+        <tr key={j}>
+          {ths.map((col, index) => {
             const isCurrent = index === colIndex && j === rowIndex;
             const isMultiSelected = index >= Math.min(colIndex, endColIndex)
               && index <= Math.max(colIndex, endColIndex)
@@ -863,6 +890,7 @@ class SouTable extends Component {
             return (
               <td
                 key={index + 1}
+                style={cellStyle}
                 data-col={index}
                 data-row={j}
                 className={isMultiSelected ? 'sou-selected-cell' : ''}
@@ -896,35 +924,110 @@ class SouTable extends Component {
       rows.push(row);
     }
     return (
-      <table
-        className="sou-table"
-        ref={table => this.table = table}
-        onContextMenu={this.onContextMenu}
-        onMouseDown={this.onMouseDown}
-        onMouseOver={this.onMouseOver}
-        onMouseUp={this.onMouseUp}
-      >
-        <thead>
-          <tr>
-            {ths}
-          </tr>
-        </thead>
+      <div>
+        <div className="left-wrapper" >
+          <table
+            className="sou-table-first-col"
+          >
+            <thead>
+              <tr>
+                <th
+                  style={cellStyle}
+                  data-col={-1}
+                  data-row={-1}
+                  onClick={this.switchColRow}
+                  onContextMenu={e => e.preventDefault()}
+                >
+                  switch
+                </th>
+              </tr>
+            </thead>
 
-        <tbody
-          onDoubleClick={e => {
-            if (e.target.getAttribute('data-col') > -1) {
-              this.showInput();
-            }
-          }}
-        >
-          {rows}
-        </tbody>
+            <tbody
+              style={{
+                marginTop: cellHeight,
+                height: (height - cellHeight + 1) + 'px',
+              }}
+              onContextMenu={this.onContextMenu}
+              onMouseDown={this.onMouseDown}
+              onMouseOver={this.onMouseOver}
+              onMouseUp={this.onMouseUp}
+              ref={rowIndicatorCol => this.rowIndicatorCol = rowIndicatorCol}
+              onScroll={this.onRowIndicatorColScroll}
+            >
+              {firstColRows}
+            </tbody>
+          </table>
+        </div>
 
-        {this.renderBorders()}
+        <div className="right-wrapper">
+          <div
+            className="right-top-wrapper"
+            style={{ width: (width - cellMinWidth - 1) + 'px' }}
+            ref={colIndicatorRow => this.colIndicatorRow = colIndicatorRow}
+            onScroll={this.onColIndicatorRowScroll}
+          >
+            <table
+              className="sou-table"
+              onContextMenu={this.onContextMenu}
+              onMouseDown={this.onMouseDown}
+              onMouseOver={this.onMouseOver}
+              onMouseUp={this.onMouseUp}
+            >
+              <thead>
+                <tr>
+                  {ths}
+                </tr>
+              </thead>
+            </table>
+          </div>
 
-        {this.renderContext()}
-      </table>
+          <div
+            className="right-bottom-wrapper"
+            style={{
+              width: (width - cellMinWidth - 1) + 'px',
+              height: (height - cellHeight) + 'px',
+            }}
+            ref={innerTable => this.innerTable = innerTable}
+            onScroll={this.onInnerTableScroll}
+          >
+            <div className="inner-wrapper">
+              <table
+                className="sou-table"
+                ref={table => this.table = table}
+                onContextMenu={this.onContextMenu}
+                onMouseDown={this.onMouseDown}
+                onMouseOver={this.onMouseOver}
+                onMouseUp={this.onMouseUp}
+              >
+                <tbody
+                  onDoubleClick={() => {
+                    this.showInput();
+                  }}
+                >
+                  {rows}
+                </tbody>
+              </table>
+
+              {this.renderBorders()}
+            </div>
+          </div>
+        </div>
+      </div>
     );
+  }
+
+  styleTable() {
+    const { tableCol } = this.state;
+    const theadTr = document.querySelector('.sou-table > thead > tr');
+    const ths = theadTr.children;
+    const tbodyTr = document.querySelector('.sou-table > tbody > tr');
+    const tds = tbodyTr.children;
+    theadTr.style.width = (tbodyTr.offsetWidth + 1) + 'px';
+    ths[0].style.width = (tds[0].offsetWidth + 1) + 'px';
+    for (let i = 1; i < tableCol; i++) {
+      ths[i].style.width = tds[i].offsetWidth + 'px';
+    }
   }
 
   renderBorders() {
@@ -971,7 +1074,7 @@ class SouTable extends Component {
   styleBorders() {
     const { colIndex, rowIndex, endColIndex, endRowIndex, dragColIndex, dragRowIndex } = this.state;
     const currentTd = this.table.querySelector(`[data-col='${colIndex}'][data-row='${rowIndex}']`);
-    const {offsetTop, offsetLeft, offsetWidth, offsetHeight} = currentTd;
+    const { offsetTop, offsetLeft, offsetWidth, offsetHeight } = currentTd;
 
     const currentBorders = document.querySelectorAll('.sou-current-borders > div');
     currentBorders[0].style = `top: ${offsetTop}px; left: ${offsetLeft}px; width: ${offsetWidth}px; height: 2px;`;
@@ -1160,7 +1263,7 @@ class SouTable extends Component {
           key="9"
           onClick={this.deleteCol}
         >
-          <span>Delete Column</span>
+          <span>Delete column</span>
         </li>
 
         <div key="d3" className="divider" />
@@ -1192,9 +1295,18 @@ class SouTable extends Component {
   }
 
   render() {
+    const { width, height } = this.props;
     return (
-      <div className="sou-table-wrapper">
+      <div
+        className="sou-table-wrapper"
+        style={{
+          width: width === undefined ? 'auto' : width + 'px',
+          height: height === undefined ? 'auto' : height + 'px',
+        }}
+        ref={wrapper => this.wrapper = wrapper}
+      >
         {this.renderTable()}
+        {this.renderContext()}
       </div>
     );
   }
@@ -1208,6 +1320,8 @@ SouTable.defaultProps = {
   ],
   minTableCol: 10,
   minTableRow: 21,
+  cellMinWidth: 50,
+  cellHeight: 28,
   getData: (data) => {
     console.log(data)
   },
@@ -1215,8 +1329,12 @@ SouTable.defaultProps = {
 
 SouTable.propTypes = {
   tableData: PropTypes.array,
+  width: PropTypes.number,
+  height: PropTypes.number,
   minTableCol: PropTypes.number,
   minTableRow: PropTypes.number,
+  cellMinWidth: PropTypes.number,
+  cellHeight: PropTypes.number,
   getData: PropTypes.func,
 };
 

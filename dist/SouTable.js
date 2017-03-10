@@ -91,7 +91,10 @@ var SouTable = function (_Component) {
     _this.getSwitchedTableData = _this.getSwitchedTableData.bind(_this);
     _this.switchColRow = _this.switchColRow.bind(_this);
     _this.sort = _this.sort.bind(_this);
-    _this.renderTable = _this.renderTable.bind(_this);
+    _this.onRowIndicatorColScroll = _this.onRowIndicatorColScroll.bind(_this);
+    _this.onColIndicatorRowScroll = _this.onColIndicatorRowScroll.bind(_this);
+    _this.onInnerTableScroll = _this.onInnerTableScroll.bind(_this);
+    _this.styleTable = _this.styleTable.bind(_this);
     _this.renderBorders = _this.renderBorders.bind(_this);
     _this.styleBorders = _this.styleBorders.bind(_this);
     _this.renderContext = _this.renderContext.bind(_this);
@@ -99,6 +102,11 @@ var SouTable = function (_Component) {
   }
 
   (0, _createClass3.default)(SouTable, [{
+    key: 'componentDidMount',
+    value: function componentDidMount() {
+      this.styleTable();
+    }
+  }, {
     key: 'componentWillReceiveProps',
     value: function componentWillReceiveProps(nextProps) {
       var tableCol = Math.max(nextProps.minTableCol, nextProps.tableData.length, this.state.tableCol);
@@ -113,6 +121,7 @@ var SouTable = function (_Component) {
     key: 'componentDidUpdate',
     value: function componentDidUpdate() {
       if (this.state.colIndex !== undefined) {
+        this.styleTable();
         this.styleBorders();
       }
     }
@@ -121,10 +130,10 @@ var SouTable = function (_Component) {
     value: function onContextMenu(e) {
       e.preventDefault();
       var target = e.target;
-      var tableRect = e.currentTarget.getBoundingClientRect();
+      var wrapperRect = this.wrapper.getBoundingClientRect();
       var contextMenuState = {
-        xPos: e.clientX - tableRect.left,
-        yPos: e.clientY - tableRect.top,
+        xPos: e.clientX - wrapperRect.left,
+        yPos: e.clientY - wrapperRect.top,
         isContextMenuHidden: false
       };
       if (target.tagName === 'TD' || target.tagName === 'TH') {
@@ -964,6 +973,22 @@ var SouTable = function (_Component) {
       };
     }
   }, {
+    key: 'onRowIndicatorColScroll',
+    value: function onRowIndicatorColScroll() {
+      this.innerTable.scrollTop = this.rowIndicatorCol.scrollTop;
+    }
+  }, {
+    key: 'onColIndicatorRowScroll',
+    value: function onColIndicatorRowScroll() {
+      this.innerTable.scrollLeft = this.colIndicatorRow.scrollLeft;
+    }
+  }, {
+    key: 'onInnerTableScroll',
+    value: function onInnerTableScroll() {
+      this.rowIndicatorCol.scrollTop = this.innerTable.scrollTop;
+      this.colIndicatorRow.scrollLeft = this.innerTable.scrollLeft;
+    }
+  }, {
     key: 'renderTable',
     value: function renderTable() {
       var _this6 = this;
@@ -976,60 +1001,71 @@ var SouTable = function (_Component) {
           rowIndex = _state14.rowIndex,
           endColIndex = _state14.endColIndex,
           endRowIndex = _state14.endRowIndex;
+      var _props = this.props,
+          width = _props.width,
+          height = _props.height,
+          cellMinWidth = _props.cellMinWidth,
+          cellHeight = _props.cellHeight;
+
+      var cellStyle = {
+        minWidth: cellMinWidth + 'px',
+        height: cellHeight + 'px'
+      };
+      var firstColRows = [];
+      for (var j = 0; j < tableRow; j++) {
+        var isRowIncluded = endRowIndex !== undefined ? j >= Math.min(rowIndex, endRowIndex) && j <= Math.max(rowIndex, endRowIndex) : j === rowIndex;
+        firstColRows.push(_react2.default.createElement(
+          'tr',
+          { key: j },
+          _react2.default.createElement(
+            'td',
+            {
+              style: cellStyle,
+              'data-col': -1,
+              'data-row': j,
+              className: isRowIncluded ? 'sou-selected-cell-indicator' : ''
+            },
+            j
+          )
+        ));
+      }
 
       var ths = [];
-      ths.push(_react2.default.createElement(
-        'th',
-        {
-          key: 0,
-          'data-col': -1,
-          'data-row': -1,
-          onClick: this.switchColRow
-        },
-        'switch'
-      ));
       for (var i = 1; i <= tableCol; i++) {
         var isColIncluded = endColIndex !== undefined ? i - 1 >= Math.min(colIndex, endColIndex) && i - 1 <= Math.max(colIndex, endColIndex) : i - 1 === colIndex;
         ths.push(_react2.default.createElement(
           'th',
           {
             key: i,
+            style: cellStyle,
             'data-col': i - 1,
             'data-row': -1,
             className: isColIncluded ? 'sou-selected-cell-indicator' : ''
           },
-          String.fromCharCode(i + 64)
+          i > 26 && String.fromCharCode(Math.floor((i - 1) / 26) + 64),
+          String.fromCharCode((i - 1) % 26 + 65)
         ));
       }
+
       var rows = [];
 
-      var _loop = function _loop(j) {
-        var isRowIncluded = endRowIndex !== undefined ? j >= Math.min(rowIndex, endRowIndex) && j <= Math.max(rowIndex, endRowIndex) : j === rowIndex;
+      var _loop = function _loop(_j) {
         var row = _react2.default.createElement(
           'tr',
-          { key: j },
-          _react2.default.createElement(
-            'td',
-            {
-              key: 0,
-              'data-col': -1,
-              'data-row': j,
-              className: isRowIncluded ? 'sou-selected-cell-indicator' : ''
-            },
-            j
-          ),
-          ths.slice(1).map(function (col, index) {
-            var isCurrent = index === colIndex && j === rowIndex;
-            var isMultiSelected = index >= Math.min(colIndex, endColIndex) && index <= Math.max(colIndex, endColIndex) && j >= Math.min(rowIndex, endRowIndex) && j <= Math.max(rowIndex, endRowIndex);
+          { key: _j },
+          ths.map(function (col, index) {
+            var isCurrent = index === colIndex && _j === rowIndex;
+            var isMultiSelected = index >= Math.min(colIndex, endColIndex) && index <= Math.max(colIndex, endColIndex) && _j >= Math.min(rowIndex, endRowIndex) && _j <= Math.max(rowIndex, endRowIndex);
             return _react2.default.createElement(
               'td',
               {
                 key: index + 1,
+                style: cellStyle,
                 'data-col': index,
-                'data-row': j,
+                'data-row': _j,
                 className: isMultiSelected ? 'sou-selected-cell' : ''
               },
-              tableData[index] !== undefined ? tableData[index][j] : '',
+              tableData[index] !== undefined ? tableData[index][_j] : '',
               isCurrent && _react2.default.createElement('input', {
                 type: 'text',
                 className: 'sou-input',
@@ -1066,44 +1102,152 @@ var SouTable = function (_Component) {
         rows.push(row);
       };
 
-      for (var j = 0; j < tableRow; j++) {
-        _loop(j);
+      for (var _j = 0; _j < tableRow; _j++) {
+        _loop(_j);
       }
       return _react2.default.createElement(
-        'table',
-        {
-          className: 'sou-table',
-          ref: function ref(table) {
-            return _this6.table = table;
-          },
-          onContextMenu: this.onContextMenu,
-          onMouseDown: this.onMouseDown,
-          onMouseOver: this.onMouseOver,
-          onMouseUp: this.onMouseUp
-        },
+        'div',
+        null,
         _react2.default.createElement(
-          'thead',
-          null,
+          'div',
+          { className: 'left-wrapper' },
           _react2.default.createElement(
-            'tr',
-            null,
-            ths
+            'table',
+            {
+              className: 'sou-table-first-col'
+            },
+            _react2.default.createElement(
+              'thead',
+              null,
+              _react2.default.createElement(
+                'tr',
+                null,
+                _react2.default.createElement(
+                  'th',
+                  {
+                    style: cellStyle,
+                    'data-col': -1,
+                    'data-row': -1,
+                    onClick: this.switchColRow,
+                    onContextMenu: function onContextMenu(e) {
+                      return e.preventDefault();
+                    }
+                  },
+                  'switch'
+                )
+              )
+            ),
+            _react2.default.createElement(
+              'tbody',
+              {
+                style: {
+                  marginTop: cellHeight,
+                  height: height - cellHeight + 1 + 'px'
+                },
+                onContextMenu: this.onContextMenu,
+                onMouseDown: this.onMouseDown,
+                onMouseOver: this.onMouseOver,
+                onMouseUp: this.onMouseUp,
+                ref: function ref(rowIndicatorCol) {
+                  return _this6.rowIndicatorCol = rowIndicatorCol;
+                },
+                onScroll: this.onRowIndicatorColScroll
+              },
+              firstColRows
+            )
           )
         ),
         _react2.default.createElement(
-          'tbody',
-          {
-            onDoubleClick: function onDoubleClick(e) {
-              if (e.target.getAttribute('data-col') > -1) {
-                _this6.showInput();
-              }
-            }
-          },
-          rows
-        ),
-        this.renderBorders(),
-        this.renderContext()
+          'div',
+          { className: 'right-wrapper' },
+          _react2.default.createElement(
+            'div',
+            {
+              className: 'right-top-wrapper',
+              style: { width: width - cellMinWidth - 1 + 'px' },
+              ref: function ref(colIndicatorRow) {
+                return _this6.colIndicatorRow = colIndicatorRow;
+              },
+              onScroll: this.onColIndicatorRowScroll
+            },
+            _react2.default.createElement(
+              'table',
+              {
+                className: 'sou-table',
+                onContextMenu: this.onContextMenu,
+                onMouseDown: this.onMouseDown,
+                onMouseOver: this.onMouseOver,
+                onMouseUp: this.onMouseUp
+              },
+              _react2.default.createElement(
+                'thead',
+                null,
+                _react2.default.createElement(
+                  'tr',
+                  null,
+                  ths
+                )
+              )
+            )
+          ),
+          _react2.default.createElement(
+            'div',
+            {
+              className: 'right-bottom-wrapper',
+              style: {
+                width: width - cellMinWidth - 1 + 'px',
+                height: height - cellHeight + 'px'
+              },
+              ref: function ref(innerTable) {
+                return _this6.innerTable = innerTable;
+              },
+              onScroll: this.onInnerTableScroll
+            },
+            _react2.default.createElement(
+              'div',
+              { className: 'inner-wrapper' },
+              _react2.default.createElement(
+                'table',
+                {
+                  className: 'sou-table',
+                  ref: function ref(table) {
+                    return _this6.table = table;
+                  },
+                  onContextMenu: this.onContextMenu,
+                  onMouseDown: this.onMouseDown,
+                  onMouseOver: this.onMouseOver,
+                  onMouseUp: this.onMouseUp
+                },
+                _react2.default.createElement(
+                  'tbody',
+                  {
+                    onDoubleClick: function onDoubleClick() {
+                      _this6.showInput();
+                    }
+                  },
+                  rows
+                )
+              ),
+              this.renderBorders()
+            )
+          )
+        )
       );
+    }
+  }, {
+    key: 'styleTable',
+    value: function styleTable() {
+      var tableCol = this.state.tableCol;
+
+      var theadTr = document.querySelector('.sou-table > thead > tr');
+      var ths = theadTr.children;
+      var tbodyTr = document.querySelector('.sou-table > tbody > tr');
+      var tds = tbodyTr.children;
+      theadTr.style.width = tbodyTr.offsetWidth + 1 + 'px';
+      ths[0].style.width = tds[0].offsetWidth + 1 + 'px';
+      for (var i = 1; i < tableCol; i++) {
+        ths[i].style.width = tds[i].offsetWidth + 'px';
+      }
     }
   }, {
     key: 'renderBorders',
@@ -1412,7 +1556,7 @@ var SouTable = function (_Component) {
           _react2.default.createElement(
             'span',
             null,
-            'Delete Column'
+            'Delete column'
           )
         ),
         _react2.default.createElement('div', { key: 'd3', className: 'divider' }),
@@ -1458,10 +1602,26 @@ var SouTable = function (_Component) {
   }, {
     key: 'render',
     value: function render() {
+      var _this8 = this;
+
+      var _props2 = this.props,
+          width = _props2.width,
+          height = _props2.height;
+
       return _react2.default.createElement(
         'div',
-        { className: 'sou-table-wrapper' },
-        this.renderTable()
+        {
+          className: 'sou-table-wrapper',
+          style: {
+            width: width === undefined ? 'auto' : width + 'px',
+            height: height === undefined ? 'auto' : height + 'px'
+          },
+          ref: function ref(wrapper) {
+            return _this8.wrapper = wrapper;
+          }
+        },
+        this.renderTable(),
+        this.renderContext()
       );
     }
   }]);
@@ -1472,6 +1632,8 @@ SouTable.defaultProps = {
   tableData: [['City', 'Beijing', 'Shanghai', 'Guangzhou'], ['Temperature', '5', '22', '29'], ['Weather', 'Windy', 'Sunny', 'Rainy']],
   minTableCol: 10,
   minTableRow: 21,
+  cellMinWidth: 50,
+  cellHeight: 28,
   getData: function getData(data) {
     console.log(data);
   }
@@ -1479,8 +1641,12 @@ SouTable.defaultProps = {
 
 SouTable.propTypes = {
   tableData: _react.PropTypes.array,
+  width: _react.PropTypes.number,
+  height: _react.PropTypes.number,
   minTableCol: _react.PropTypes.number,
   minTableRow: _react.PropTypes.number,
+  cellMinWidth: _react.PropTypes.number,
+  cellHeight: _react.PropTypes.number,
   getData: _react.PropTypes.func
 };
 

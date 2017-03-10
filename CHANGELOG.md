@@ -1,3 +1,11 @@
+## 0.1.4
+
+`2017-3-12`
+
+- New feature: horizontal / vertical scrolling with sticky headers
+- New featureL styling cell width / height
+- Fix bug: typos in README Usage
+
 ## 0.1.3
 
 `2017-3-8`
