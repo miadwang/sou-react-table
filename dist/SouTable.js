@@ -91,8 +91,8 @@ var SouTable = function (_Component) {
     _this.getSwitchedTableData = _this.getSwitchedTableData.bind(_this);
     _this.switchColRow = _this.switchColRow.bind(_this);
     _this.sort = _this.sort.bind(_this);
-    _this.onRowIndicatorColScroll = _this.onRowIndicatorColScroll.bind(_this);
-    _this.onColIndicatorRowScroll = _this.onColIndicatorRowScroll.bind(_this);
+    _this.onLeftHeaderScroll = _this.onLeftHeaderScroll.bind(_this);
+    _this.onTopHeaderScroll = _this.onTopHeaderScroll.bind(_this);
     _this.onInnerTableScroll = _this.onInnerTableScroll.bind(_this);
     _this.styleTable = _this.styleTable.bind(_this);
     _this.renderBorders = _this.renderBorders.bind(_this);
@@ -973,20 +973,65 @@ var SouTable = function (_Component) {
       };
     }
   }, {
-    key: 'onRowIndicatorColScroll',
-    value: function onRowIndicatorColScroll() {
-      this.innerTable.scrollTop = this.rowIndicatorCol.scrollTop;
+    key: 'onLeftHeaderScroll',
+    value: function onLeftHeaderScroll() {
+      var scrollTop = this.leftHeader.scrollTop;
+      if (this.scrollTop !== scrollTop) {
+        this.scrollTop == scrollTop;
+        this.innerTable.scrollTop = scrollTop;
+        if (scrollTop > 0) {
+          this.topHeader.style.height = this.props.cellHeight + 1 + 'px';
+          this.innerTable.style.marginTop = '-1px';
+          this.leftHeaderHead.style.height = this.props.cellHeight + 1 + 'px';
+        } else {
+          this.topHeader.style.height = this.props.cellHeight + 'px';
+          this.innerTable.style.marginTop = 0;
+          this.leftHeaderHead.style.height = this.props.cellHeight + 'px';
+        }
+      }
     }
   }, {
-    key: 'onColIndicatorRowScroll',
-    value: function onColIndicatorRowScroll() {
-      this.innerTable.scrollLeft = this.colIndicatorRow.scrollLeft;
+    key: 'onTopHeaderScroll',
+    value: function onTopHeaderScroll() {
+      var scrollLeft = this.topHeader.scrollLeft;
+      if (this.scrollLeft !== scrollLeft) {
+        this.scrollLeft = scrollLeft;
+        this.innerTable.scrollLeft = scrollLeft;
+        if (scrollLeft > 0) {
+          this.leftWrapper.style.width = this.props.minCellWidth + 1 + 'px';
+        } else {
+          this.leftWrapper.style.width = this.props.minCellWidth + 'px';
+        }
+      }
     }
   }, {
     key: 'onInnerTableScroll',
     value: function onInnerTableScroll() {
-      this.rowIndicatorCol.scrollTop = this.innerTable.scrollTop;
-      this.colIndicatorRow.scrollLeft = this.innerTable.scrollLeft;
+      var scrollTop = this.innerTable.scrollTop;
+      var scrollLeft = this.innerTable.scrollLeft;
+      if (this.scrollTop !== scrollTop) {
+        this.scrollTop = scrollTop;
+        this.leftHeader.scrollTop = scrollTop;
+        if (scrollTop > 0) {
+          this.topHeader.style.height = this.props.cellHeight + 1 + 'px';
+          this.innerTable.style.marginTop = '-1px';
+          this.leftHeaderHead.style.height = this.props.cellHeight + 1 + 'px';
+        } else {
+          this.topHeader.style.height = this.props.cellHeight + 'px';
+          this.innerTable.style.marginTop = 0;
+          this.leftHeaderHead.style.height = this.props.cellHeight + 'px';
+        }
+      }
+
+      if (this.scrollLeft !== scrollLeft) {
+        this.scrollLeft = scrollLeft;
+        this.topHeader.scrollLeft = scrollLeft;
+        if (scrollLeft > 0) {
+          this.leftWrapper.style.width = this.props.minCellWidth + 1 + 'px';
+        } else {
+          this.leftWrapper.style.width = this.props.minCellWidth + 'px';
+        }
+      }
     }
   }, {
     key: 'renderTable',
@@ -1004,17 +1049,17 @@ var SouTable = function (_Component) {
       var _props = this.props,
           width = _props.width,
           height = _props.height,
-          cellMinWidth = _props.cellMinWidth,
+          minCellWidth = _props.minCellWidth,
           cellHeight = _props.cellHeight;
 
       var cellStyle = {
-        minWidth: cellMinWidth + 'px',
+        minWidth: minCellWidth + 'px',
         height: cellHeight + 'px'
       };
-      var firstColRows = [];
+      var leftHeaderRows = [];
       for (var j = 0; j < tableRow; j++) {
         var isRowIncluded = endRowIndex !== undefined ? j >= Math.min(rowIndex, endRowIndex) && j <= Math.max(rowIndex, endRowIndex) : j === rowIndex;
-        firstColRows.push(_react2.default.createElement(
+        leftHeaderRows.push(_react2.default.createElement(
           'tr',
           { key: j },
           _react2.default.createElement(
@@ -1110,15 +1155,30 @@ var SouTable = function (_Component) {
         null,
         _react2.default.createElement(
           'div',
-          { className: 'left-wrapper' },
+          {
+            className: 'left-wrapper',
+            style: {
+              width: minCellWidth
+            },
+            ref: function ref(leftWrapper) {
+              return _this6.leftWrapper = leftWrapper;
+            }
+          },
           _react2.default.createElement(
             'table',
             {
-              className: 'sou-table-first-col'
+              className: 'sou-table-left-header'
             },
             _react2.default.createElement(
               'thead',
-              null,
+              {
+                style: {
+                  height: cellHeight + 'px'
+                },
+                ref: function ref(leftHeaderHead) {
+                  return _this6.leftHeaderHead = leftHeaderHead;
+                }
+              },
               _react2.default.createElement(
                 'tr',
                 null,
@@ -1142,18 +1202,18 @@ var SouTable = function (_Component) {
               {
                 style: {
                   marginTop: cellHeight,
-                  height: height - cellHeight + 1 + 'px'
+                  height: height - cellHeight + 'px'
                 },
                 onContextMenu: this.onContextMenu,
                 onMouseDown: this.onMouseDown,
                 onMouseOver: this.onMouseOver,
                 onMouseUp: this.onMouseUp,
-                ref: function ref(rowIndicatorCol) {
-                  return _this6.rowIndicatorCol = rowIndicatorCol;
+                ref: function ref(leftHeader) {
+                  return _this6.leftHeader = leftHeader;
                 },
-                onScroll: this.onRowIndicatorColScroll
+                onScroll: this.onLeftHeaderScroll
               },
-              firstColRows
+              leftHeaderRows
             )
           )
         ),
@@ -1164,11 +1224,14 @@ var SouTable = function (_Component) {
             'div',
             {
               className: 'right-top-wrapper',
-              style: { width: width - cellMinWidth - 1 + 'px' },
-              ref: function ref(colIndicatorRow) {
-                return _this6.colIndicatorRow = colIndicatorRow;
+              style: {
+                width: width - minCellWidth - 1 + 'px',
+                height: cellHeight + 'px'
               },
-              onScroll: this.onColIndicatorRowScroll
+              ref: function ref(topHeader) {
+                return _this6.topHeader = topHeader;
+              },
+              onScroll: this.onTopHeaderScroll
             },
             _react2.default.createElement(
               'table',
@@ -1195,7 +1258,7 @@ var SouTable = function (_Component) {
             {
               className: 'right-bottom-wrapper',
               style: {
-                width: width - cellMinWidth - 1 + 'px',
+                width: width - minCellWidth - 1 + 'px',
                 height: height - cellHeight + 'px'
               },
               ref: function ref(innerTable) {
@@ -1317,10 +1380,10 @@ var SouTable = function (_Component) {
 
 
       var currentBorders = document.querySelectorAll('.sou-current-borders > div');
-      currentBorders[0].style = 'top: ' + offsetTop + 'px; left: ' + offsetLeft + 'px; width: ' + offsetWidth + 'px; height: 2px;';
-      currentBorders[1].style = 'top: ' + offsetTop + 'px; left: ' + (offsetLeft + offsetWidth - 1) + 'px; width: 2px; height: ' + offsetHeight + 'px;';
-      currentBorders[2].style = 'top: ' + (offsetTop + offsetHeight - 1) + 'px; left: ' + offsetLeft + 'px; width: ' + offsetWidth + 'px; height: 2px;';
-      currentBorders[3].style = 'top: ' + offsetTop + 'px; left: ' + offsetLeft + 'px; width: 2px; height: ' + offsetHeight + 'px;';
+      currentBorders[0].setAttribute('style', 'top: ' + offsetTop + 'px; left: ' + offsetLeft + 'px; width: ' + offsetWidth + 'px; height: 2px;');
+      currentBorders[1].setAttribute('style', 'top: ' + offsetTop + 'px; left: ' + (offsetLeft + offsetWidth - 1) + 'px; width: 2px; height: ' + offsetHeight + 'px;');
+      currentBorders[2].setAttribute('style', 'top: ' + (offsetTop + offsetHeight - 1) + 'px; left: ' + offsetLeft + 'px; width: ' + offsetWidth + 'px; height: 2px;');
+      currentBorders[3].setAttribute('style', 'top: ' + offsetTop + 'px; left: ' + offsetLeft + 'px; width: 2px; height: ' + offsetHeight + 'px;');
 
       var multiSelectOffsetTop = void 0,
           multiSelectOffsetLeft = void 0,
@@ -1343,13 +1406,13 @@ var SouTable = function (_Component) {
         multiSelectOffsetHeight = offsetTop >= endOffsetTop ? offsetTop - endOffsetTop + offsetHeight : endOffsetTop - offsetTop + endOffsetHeight;
 
         var areaBorders = document.querySelectorAll('.sou-area-borders > div');
-        areaBorders[0].style = 'top: ' + multiSelectOffsetTop + 'px; left: ' + multiSelectOffsetLeft + 'px; width: ' + multiSelectOffsetWidth + 'px; height: 1px;';
-        areaBorders[1].style = 'top: ' + multiSelectOffsetTop + 'px; left: ' + (multiSelectOffsetLeft + multiSelectOffsetWidth) + 'px; width: 1px; height: ' + multiSelectOffsetHeight + 'px;';
-        areaBorders[2].style = 'top: ' + (multiSelectOffsetTop + multiSelectOffsetHeight) + 'px; left: ' + multiSelectOffsetLeft + 'px; width: ' + multiSelectOffsetWidth + 'px; height: 1px;';
-        areaBorders[3].style = 'top: ' + multiSelectOffsetTop + 'px; left: ' + multiSelectOffsetLeft + 'px; width: 1px; height: ' + multiSelectOffsetHeight + 'px;';
-        areaBorders[4].style = 'display: ' + (this.state.isTyping ? 'none' : 'initial') + '; top: ' + (multiSelectOffsetTop + multiSelectOffsetHeight - 4) + 'px; left: ' + (multiSelectOffsetLeft + multiSelectOffsetWidth - 4) + 'px;';
+        areaBorders[0].setAttribute('style', 'top: ' + multiSelectOffsetTop + 'px; left: ' + multiSelectOffsetLeft + 'px; width: ' + multiSelectOffsetWidth + 'px; height: 1px;');
+        areaBorders[1].setAttribute('style', 'top: ' + multiSelectOffsetTop + 'px; left: ' + (multiSelectOffsetLeft + multiSelectOffsetWidth) + 'px; width: 1px; height: ' + multiSelectOffsetHeight + 'px;');
+        areaBorders[2].setAttribute('style', 'top: ' + (multiSelectOffsetTop + multiSelectOffsetHeight) + 'px; left: ' + multiSelectOffsetLeft + 'px; width: ' + multiSelectOffsetWidth + 'px; height: 1px;');
+        areaBorders[3].setAttribute('style', 'top: ' + multiSelectOffsetTop + 'px; left: ' + multiSelectOffsetLeft + 'px; width: 1px; height: ' + multiSelectOffsetHeight + 'px;');
+        areaBorders[4].setAttribute('style', 'display: ' + (this.state.isTyping ? 'none' : 'initial') + '; top: ' + (multiSelectOffsetTop + multiSelectOffsetHeight - 4) + 'px; left: ' + (multiSelectOffsetLeft + multiSelectOffsetWidth - 4) + 'px;');
       } else {
-        currentBorders[4].style = 'display: ' + (this.state.isTyping ? 'none' : 'initial') + '; top: ' + (offsetTop + offsetHeight - 4) + 'px; left: ' + (offsetLeft + offsetWidth - 4) + 'px;';
+        currentBorders[4].setAttribute('style', 'display: ' + (this.state.isTyping ? 'none' : 'initial') + '; top: ' + (offsetTop + offsetHeight - 4) + 'px; left: ' + (offsetLeft + offsetWidth - 4) + 'px;');
       }
 
       if (dragColIndex !== undefined) {
@@ -1421,10 +1484,10 @@ var SouTable = function (_Component) {
         }
 
         var pasteBorders = document.querySelectorAll('.sou-paste-borders > div');
-        pasteBorders[0].style = 'top: ' + autoPasteOffsetTop + 'px; left: ' + autoPasteOffsetLeft + 'px; width: ' + autoPasteOffsetWidth + 'px; height: 1px;';
-        pasteBorders[1].style = 'top: ' + autoPasteOffsetTop + 'px; left: ' + (autoPasteOffsetLeft + autoPasteOffsetWidth) + 'px; width: 1px; height: ' + autoPasteOffsetHeight + 'px;';
-        pasteBorders[2].style = 'top: ' + (autoPasteOffsetTop + autoPasteOffsetHeight) + 'px; left: ' + autoPasteOffsetLeft + 'px; width: ' + autoPasteOffsetWidth + 'px; height: 1px;';
-        pasteBorders[3].style = 'top: ' + autoPasteOffsetTop + 'px; left: ' + autoPasteOffsetLeft + 'px; width: 1px; height: ' + autoPasteOffsetHeight + 'px;';
+        pasteBorders[0].setAttribute('style', 'top: ' + autoPasteOffsetTop + 'px; left: ' + autoPasteOffsetLeft + 'px; width: ' + autoPasteOffsetWidth + 'px; height: 1px;');
+        pasteBorders[1].setAttribute('style', 'top: ' + autoPasteOffsetTop + 'px; left: ' + (autoPasteOffsetLeft + autoPasteOffsetWidth) + 'px; width: 1px; height: ' + autoPasteOffsetHeight + 'px;');
+        pasteBorders[2].setAttribute('style', 'top: ' + (autoPasteOffsetTop + autoPasteOffsetHeight) + 'px; left: ' + autoPasteOffsetLeft + 'px; width: ' + autoPasteOffsetWidth + 'px; height: 1px;');
+        pasteBorders[3].setAttribute('style', 'top: ' + autoPasteOffsetTop + 'px; left: ' + autoPasteOffsetLeft + 'px; width: 1px; height: ' + autoPasteOffsetHeight + 'px;');
       }
     }
   }, {
@@ -1632,7 +1695,7 @@ SouTable.defaultProps = {
   tableData: [['City', 'Beijing', 'Shanghai', 'Guangzhou'], ['Temperature', '5', '22', '29'], ['Weather', 'Windy', 'Sunny', 'Rainy']],
   minTableCol: 10,
   minTableRow: 21,
-  cellMinWidth: 50,
+  minCellWidth: 50,
   cellHeight: 28,
   getData: function getData(data) {
     console.log(data);
@@ -1645,7 +1708,7 @@ SouTable.propTypes = {
   height: _react.PropTypes.number,
   minTableCol: _react.PropTypes.number,
   minTableRow: _react.PropTypes.number,
-  cellMinWidth: _react.PropTypes.number,
+  minCellWidth: _react.PropTypes.number,
   cellHeight: _react.PropTypes.number,
   getData: _react.PropTypes.func
 };
