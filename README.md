@@ -1,6 +1,8 @@
 
 # Sou React Table
 
+[![npm version](https://badge.fury.io/js/sou-react-table.svg)](https://badge.fury.io/js/sou-react-table)
+
 A spreadsheet component for React ([Demo](https://miadwang.github.io/sou-react-table/))
 
 ![SouTable](./screenshot.png?raw=true "SouTable")
