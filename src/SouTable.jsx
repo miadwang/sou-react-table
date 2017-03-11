@@ -54,8 +54,8 @@ class SouTable extends Component {
     this.getSwitchedTableData = this.getSwitchedTableData.bind(this);
     this.switchColRow = this.switchColRow.bind(this);
     this.sort = this.sort.bind(this);
-    this.onRowIndicatorColScroll = this.onRowIndicatorColScroll.bind(this);
-    this.onColIndicatorRowScroll = this.onColIndicatorRowScroll.bind(this);
+    this.onLeftHeaderScroll = this.onLeftHeaderScroll.bind(this);
+    this.onTopHeaderScroll = this.onTopHeaderScroll.bind(this);
     this.onInnerTableScroll = this.onInnerTableScroll.bind(this);
     this.styleTable = this.styleTable.bind(this);
     this.renderBorders = this.renderBorders.bind(this);
@@ -821,31 +821,76 @@ class SouTable extends Component {
     };
   }
 
-  onRowIndicatorColScroll() {
-    this.innerTable.scrollTop = this.rowIndicatorCol.scrollTop;
+  onLeftHeaderScroll() {
+    const scrollTop = this.leftHeader.scrollTop;
+    if (this.scrollTop !== scrollTop) {
+      this.scrollTop == scrollTop;
+      this.innerTable.scrollTop = scrollTop;
+      if (scrollTop > 0) {
+        this.topHeader.style.height = (this.props.cellHeight + 1) + 'px';
+        this.innerTable.style.marginTop = '-1px';
+        this.leftHeaderHead.style.height = (this.props.cellHeight + 1) + 'px';
+      } else {
+        this.topHeader.style.height = this.props.cellHeight + 'px';
+        this.innerTable.style.marginTop = 0;
+        this.leftHeaderHead.style.height = this.props.cellHeight + 'px';
+      }
+    }
   }
 
-  onColIndicatorRowScroll() {
-    this.innerTable.scrollLeft = this.colIndicatorRow.scrollLeft;
+  onTopHeaderScroll() {
+    const scrollLeft = this.topHeader.scrollLeft;
+    if (this.scrollLeft !== scrollLeft) {
+      this.scrollLeft = scrollLeft;
+      this.innerTable.scrollLeft = scrollLeft;
+      if (scrollLeft > 0) {
+        this.leftWrapper.style.width = (this.props.minCellWidth + 1) + 'px';
+      } else {
+        this.leftWrapper.style.width = this.props.minCellWidth + 'px';
+      }
+    }
   }
 
   onInnerTableScroll() {
-    this.rowIndicatorCol.scrollTop = this.innerTable.scrollTop;
-    this.colIndicatorRow.scrollLeft = this.innerTable.scrollLeft;
+    const scrollTop = this.innerTable.scrollTop;
+    const scrollLeft = this.innerTable.scrollLeft;
+    if (this.scrollTop !== scrollTop) {
+      this.scrollTop = scrollTop;
+      this.leftHeader.scrollTop = scrollTop;
+      if (scrollTop > 0) {
+        this.topHeader.style.height = (this.props.cellHeight + 1) + 'px';
+        this.innerTable.style.marginTop = '-1px';
+        this.leftHeaderHead.style.height = (this.props.cellHeight + 1) + 'px';
+      } else {
+        this.topHeader.style.height = this.props.cellHeight + 'px';
+        this.innerTable.style.marginTop = 0;
+        this.leftHeaderHead.style.height = this.props.cellHeight + 'px';
+      }
+    }
+
+    if (this.scrollLeft !== scrollLeft) {
+      this.scrollLeft = scrollLeft;
+      this.topHeader.scrollLeft = scrollLeft;
+      if (scrollLeft > 0) {
+        this.leftWrapper.style.width = (this.props.minCellWidth + 1) + 'px';
+      } else {
+        this.leftWrapper.style.width = this.props.minCellWidth + 'px';
+      }
+    }
   }
 
   renderTable() {
     let { tableData, tableCol, tableRow, colIndex, rowIndex, endColIndex, endRowIndex } = this.state;
-    const { width, height, cellMinWidth, cellHeight } = this.props;
+    const { width, height, minCellWidth, cellHeight } = this.props;
     const cellStyle = {
-      minWidth: cellMinWidth + 'px',
+      minWidth: minCellWidth + 'px',
       height: cellHeight + 'px',
     };
-    const firstColRows = [];
+    const leftHeaderRows = [];
     for (let j = 0; j < tableRow; j++) {
       const isRowIncluded = endRowIndex !== undefined ? (j >= Math.min(rowIndex, endRowIndex)
       && j <= Math.max(rowIndex, endRowIndex)) : (j === rowIndex);
-      firstColRows.push(
+      leftHeaderRows.push(
         <tr key={j}>
           <td
             style={cellStyle}
@@ -925,11 +970,22 @@ class SouTable extends Component {
     }
     return (
       <div>
-        <div className="left-wrapper" >
+        <div
+          className="left-wrapper"
+          style={{
+            width: minCellWidth,
+          }}
+          ref={leftWrapper => this.leftWrapper = leftWrapper}
+        >
           <table
-            className="sou-table-first-col"
+            className="sou-table-left-header"
           >
-            <thead>
+            <thead
+              style={{
+                height: cellHeight + 'px',
+              }}
+              ref={leftHeaderHead => this.leftHeaderHead = leftHeaderHead}
+            >
               <tr>
                 <th
                   style={cellStyle}
@@ -946,16 +1002,16 @@ class SouTable extends Component {
             <tbody
               style={{
                 marginTop: cellHeight,
-                height: (height - cellHeight + 1) + 'px',
+                height: (height - cellHeight) + 'px',
               }}
               onContextMenu={this.onContextMenu}
               onMouseDown={this.onMouseDown}
               onMouseOver={this.onMouseOver}
               onMouseUp={this.onMouseUp}
-              ref={rowIndicatorCol => this.rowIndicatorCol = rowIndicatorCol}
-              onScroll={this.onRowIndicatorColScroll}
+              ref={leftHeader => this.leftHeader = leftHeader}
+              onScroll={this.onLeftHeaderScroll}
             >
-              {firstColRows}
+              {leftHeaderRows}
             </tbody>
           </table>
         </div>
@@ -963,9 +1019,12 @@ class SouTable extends Component {
         <div className="right-wrapper">
           <div
             className="right-top-wrapper"
-            style={{ width: (width - cellMinWidth - 1) + 'px' }}
-            ref={colIndicatorRow => this.colIndicatorRow = colIndicatorRow}
-            onScroll={this.onColIndicatorRowScroll}
+            style={{
+              width: (width - minCellWidth - 1) + 'px',
+              height: cellHeight + 'px',
+            }}
+            ref={topHeader => this.topHeader = topHeader}
+            onScroll={this.onTopHeaderScroll}
           >
             <table
               className="sou-table"
@@ -985,7 +1044,7 @@ class SouTable extends Component {
           <div
             className="right-bottom-wrapper"
             style={{
-              width: (width - cellMinWidth - 1) + 'px',
+              width: (width - minCellWidth - 1) + 'px',
               height: (height - cellHeight) + 'px',
             }}
             ref={innerTable => this.innerTable = innerTable}
@@ -1077,10 +1136,10 @@ class SouTable extends Component {
     const { offsetTop, offsetLeft, offsetWidth, offsetHeight } = currentTd;
 
     const currentBorders = document.querySelectorAll('.sou-current-borders > div');
-    currentBorders[0].style = `top: ${offsetTop}px; left: ${offsetLeft}px; width: ${offsetWidth}px; height: 2px;`;
-    currentBorders[1].style = `top: ${offsetTop}px; left: ${offsetLeft + offsetWidth - 1}px; width: 2px; height: ${offsetHeight}px;`;
-    currentBorders[2].style = `top: ${offsetTop + offsetHeight - 1}px; left: ${offsetLeft}px; width: ${offsetWidth}px; height: 2px;`;
-    currentBorders[3].style = `top: ${offsetTop}px; left: ${offsetLeft}px; width: 2px; height: ${offsetHeight}px;`;
+    currentBorders[0].setAttribute('style', `top: ${offsetTop}px; left: ${offsetLeft}px; width: ${offsetWidth}px; height: 2px;`);
+    currentBorders[1].setAttribute('style', `top: ${offsetTop}px; left: ${offsetLeft + offsetWidth - 1}px; width: 2px; height: ${offsetHeight}px;`);
+    currentBorders[2].setAttribute('style', `top: ${offsetTop + offsetHeight - 1}px; left: ${offsetLeft}px; width: ${offsetWidth}px; height: 2px;`);
+    currentBorders[3].setAttribute('style', `top: ${offsetTop}px; left: ${offsetLeft}px; width: 2px; height: ${offsetHeight}px;`);
 
     let multiSelectOffsetTop, multiSelectOffsetLeft, multiSelectOffsetWidth, multiSelectOffsetHeight,
       autoPasteOffsetTop, autoPasteOffsetLeft, autoPasteOffsetWidth, autoPasteOffsetHeight;
@@ -1099,13 +1158,13 @@ class SouTable extends Component {
         : endOffsetTop - offsetTop + endOffsetHeight;
 
       const areaBorders = document.querySelectorAll('.sou-area-borders > div');
-      areaBorders[0].style = `top: ${multiSelectOffsetTop}px; left: ${multiSelectOffsetLeft}px; width: ${multiSelectOffsetWidth}px; height: 1px;`;
-      areaBorders[1].style = `top: ${multiSelectOffsetTop}px; left: ${multiSelectOffsetLeft + multiSelectOffsetWidth}px; width: 1px; height: ${multiSelectOffsetHeight}px;`;
-      areaBorders[2].style = `top: ${multiSelectOffsetTop + multiSelectOffsetHeight}px; left: ${multiSelectOffsetLeft}px; width: ${multiSelectOffsetWidth}px; height: 1px;`;
-      areaBorders[3].style = `top: ${multiSelectOffsetTop}px; left: ${multiSelectOffsetLeft}px; width: 1px; height: ${multiSelectOffsetHeight}px;`;
-      areaBorders[4].style = `display: ${this.state.isTyping ? 'none' : 'initial'}; top: ${multiSelectOffsetTop + multiSelectOffsetHeight - 4}px; left: ${multiSelectOffsetLeft + multiSelectOffsetWidth - 4}px;`;
+      areaBorders[0].setAttribute('style', `top: ${multiSelectOffsetTop}px; left: ${multiSelectOffsetLeft}px; width: ${multiSelectOffsetWidth}px; height: 1px;`);
+      areaBorders[1].setAttribute('style', `top: ${multiSelectOffsetTop}px; left: ${multiSelectOffsetLeft + multiSelectOffsetWidth}px; width: 1px; height: ${multiSelectOffsetHeight}px;`);
+      areaBorders[2].setAttribute('style', `top: ${multiSelectOffsetTop + multiSelectOffsetHeight}px; left: ${multiSelectOffsetLeft}px; width: ${multiSelectOffsetWidth}px; height: 1px;`);
+      areaBorders[3].setAttribute('style', `top: ${multiSelectOffsetTop}px; left: ${multiSelectOffsetLeft}px; width: 1px; height: ${multiSelectOffsetHeight}px;`);
+      areaBorders[4].setAttribute('style', `display: ${this.state.isTyping ? 'none' : 'initial'}; top: ${multiSelectOffsetTop + multiSelectOffsetHeight - 4}px; left: ${multiSelectOffsetLeft + multiSelectOffsetWidth - 4}px;`);
     } else {
-      currentBorders[4].style = `display: ${this.state.isTyping ? 'none' : 'initial'}; top: ${offsetTop + offsetHeight - 4}px; left: ${offsetLeft + offsetWidth - 4}px;`;
+      currentBorders[4].setAttribute('style', `display: ${this.state.isTyping ? 'none' : 'initial'}; top: ${offsetTop + offsetHeight - 4}px; left: ${offsetLeft + offsetWidth - 4}px;`);
     }
 
     if (dragColIndex !== undefined) {
@@ -1177,10 +1236,10 @@ class SouTable extends Component {
       }
 
       const pasteBorders = document.querySelectorAll('.sou-paste-borders > div');
-      pasteBorders[0].style = `top: ${autoPasteOffsetTop}px; left: ${autoPasteOffsetLeft}px; width: ${autoPasteOffsetWidth}px; height: 1px;`;
-      pasteBorders[1].style = `top: ${autoPasteOffsetTop}px; left: ${autoPasteOffsetLeft + autoPasteOffsetWidth}px; width: 1px; height: ${autoPasteOffsetHeight}px;`;
-      pasteBorders[2].style = `top: ${autoPasteOffsetTop + autoPasteOffsetHeight}px; left: ${autoPasteOffsetLeft}px; width: ${autoPasteOffsetWidth}px; height: 1px;`;
-      pasteBorders[3].style = `top: ${autoPasteOffsetTop}px; left: ${autoPasteOffsetLeft}px; width: 1px; height: ${autoPasteOffsetHeight}px;`;
+      pasteBorders[0].setAttribute('style', `top: ${autoPasteOffsetTop}px; left: ${autoPasteOffsetLeft}px; width: ${autoPasteOffsetWidth}px; height: 1px;`);
+      pasteBorders[1].setAttribute('style', `top: ${autoPasteOffsetTop}px; left: ${autoPasteOffsetLeft + autoPasteOffsetWidth}px; width: 1px; height: ${autoPasteOffsetHeight}px;`);
+      pasteBorders[2].setAttribute('style', `top: ${autoPasteOffsetTop + autoPasteOffsetHeight}px; left: ${autoPasteOffsetLeft}px; width: ${autoPasteOffsetWidth}px; height: 1px;`);
+      pasteBorders[3].setAttribute('style', `top: ${autoPasteOffsetTop}px; left: ${autoPasteOffsetLeft}px; width: 1px; height: ${autoPasteOffsetHeight}px;`);
     }
   }
 
@@ -1320,7 +1379,7 @@ SouTable.defaultProps = {
   ],
   minTableCol: 10,
   minTableRow: 21,
-  cellMinWidth: 50,
+  minCellWidth: 50,
   cellHeight: 28,
   getData: (data) => {
     console.log(data)
@@ -1333,7 +1392,7 @@ SouTable.propTypes = {
   height: PropTypes.number,
   minTableCol: PropTypes.number,
   minTableRow: PropTypes.number,
-  cellMinWidth: PropTypes.number,
+  minCellWidth: PropTypes.number,
   cellHeight: PropTypes.number,
   getData: PropTypes.func,
 };

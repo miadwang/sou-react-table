@@ -8,14 +8,15 @@ storiesOf('SouTable', module)
     <SouTable />
   ))
   .add('scrollable view', () => (
-    <SouTable minTableCol={35} width={600} height={560} />
+    <SouTable minTableCol={35} minTableRow={60} width={603} height={561} />
   ))
   .add('styled cell view', () => (
     <SouTable
       minTableCol={35}
-      width={600}
-      height={560}
-      cellMinWidth={70}
+      minTableRow={60}
+      width={603}
+      height={561}
+      minCellWidth={70}
       cellHeight={40}
     />
   ));

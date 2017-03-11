@@ -32,7 +32,7 @@ You'll need to install React and ReactDOM separately since they are not included
 
 ## Usage
 
-`SouTable` can be used as below
+`SouTable` can be used as below. You can style it by importing your own css file.
 
 ```js
 import SouTable from 'sou-react-table';
@@ -137,6 +137,9 @@ function getData(data) {
 
 Callback function `getData` is executed when table data changes. The changed table data will be passed as the parameter.
 
+## Browser Compatibility
+
+Only **Chrome** at present.
 
 ## Contributing
 
