@@ -42,9 +42,9 @@ import 'sou-react-table/SouTable.css';
 
 <SouTable
   tableData={[
-    { 'City', 'Beijing', 'Shanghai', 'Guangzhou' },
-    { 'Temperature', '5', '22', '29' },
-    { 'Weather', 'Windy', 'Sunny', 'Rainy' },
+    [ 'City', 'Beijing', 'Shanghai', 'Guangzhou' ],
+    [ 'Temperature', '5', '22', '29' ],
+    [ 'Weather', 'Windy', 'Sunny', 'Rainy' ],
   ]}
   width={600}
   height={600}
