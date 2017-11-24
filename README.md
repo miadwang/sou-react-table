@@ -66,9 +66,9 @@ default value:
 
 ```js
 [
-  { 'City', 'Beijing', 'Shanghai', 'Guangzhou' },
-  { 'Temperature', '5', '22', '29' },
-  { 'Weather', 'Windy', 'Sunny', 'Rainy' },
+  [ 'City', 'Beijing', 'Shanghai', 'Guangzhou' ],
+  [ 'Temperature', '5', '22', '29' ],
+  [ 'Weather', 'Windy', 'Sunny', 'Rainy' ],
 ]
 ```
 
