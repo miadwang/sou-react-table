@@ -32,6 +32,10 @@ var _react = require('react');
 
 var _react2 = _interopRequireDefault(_react);
 
+var _propTypes = require('prop-types');
+
+var _propTypes2 = _interopRequireDefault(_propTypes);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var SouTable = function (_Component) {
@@ -1703,14 +1707,14 @@ SouTable.defaultProps = {
 };
 
 SouTable.propTypes = {
-  tableData: _react.PropTypes.array,
-  width: _react.PropTypes.number,
-  height: _react.PropTypes.number,
-  minTableCol: _react.PropTypes.number,
-  minTableRow: _react.PropTypes.number,
-  minCellWidth: _react.PropTypes.number,
-  cellHeight: _react.PropTypes.number,
-  getData: _react.PropTypes.func
+  tableData: _propTypes2.default.array,
+  width: _propTypes2.default.number,
+  height: _propTypes2.default.number,
+  minTableCol: _propTypes2.default.number,
+  minTableRow: _propTypes2.default.number,
+  minCellWidth: _propTypes2.default.number,
+  cellHeight: _propTypes2.default.number,
+  getData: _propTypes2.default.func
 };
 
 exports.default = SouTable;
