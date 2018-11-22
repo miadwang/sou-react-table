@@ -1,12 +1,9 @@
-// IMPORTANT
-// ---------
-// This is an auto generated file with React CDK.
-// Do not modify this file.
+import { configure } from '@storybook/react';
 
-import { configure } from '@kadira/storybook';
-
+// automatically import all files ending in *.stories.js
+const req = require.context('../stories', true, /.stories.js$/);
 function loadStories() {
-  require('../src/stories');
+  req.keys().forEach(filename => req(filename));
 }
 
 configure(loadStories, module);

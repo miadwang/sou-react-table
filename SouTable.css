@@ -197,6 +197,7 @@
 
 .sou-context > li {
     padding: 0 20px;
+    text-align: left;
 }
 
 .sou-context > li > span {

@@ -1,15 +1,46 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
-class SouTable extends Component {
+const trimData = (tableData) => {
+  const tableDataCol = tableData.length;
+  const tableDataRow = tableData.length > 0 ? tableData[0].length : 0;
+  const newTableData = [];
+  let newTableDataCol = tableDataCol;
+  let newTableDataRow = tableDataRow;
 
+  for (let i = newTableDataCol - 1; i >= 0; i -= 1) {
+    if (tableData[i].every(datum => datum === '')) {
+      newTableDataCol -= 1;
+    } else {
+      break;
+    }
+  }
+  loop: { // eslint
+    for (let j = newTableDataRow - 1; j >= 0; j -= 1) {
+      for (let i = 0; i < tableDataCol; i += 1) {
+        if (tableData[i][j] !== '') {
+          break loop;
+        }
+      }
+      newTableDataRow -= 1;
+    }
+  }
+
+  for (let i = 0; i < newTableDataCol; i += 1) {
+    newTableData[i] = tableData[i].slice(0, newTableDataRow);
+  }
+  return newTableData;
+};
+
+class SouTable extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
       tableData: props.tableData,
       tableCol: Math.max(props.minTableCol, props.tableData.length),
-      tableRow: Math.max(props.minTableRow, props.tableData.length > 0 ? props.tableData[0].length : 0),
+      tableRow: Math.max(props.minTableRow, props.tableData.length > 0
+        ? props.tableData[0].length : 0),
       colIndex: undefined,
       rowIndex: undefined,
       endColIndex: undefined,
@@ -32,7 +63,6 @@ class SouTable extends Component {
     this.onChangeInputValue = this.onChangeInputValue.bind(this);
     this.onInputKeyPress = this.onInputKeyPress.bind(this);
     this.onInputKeyDown = this.onInputKeyDown.bind(this);
-    this.trimData = this.trimData.bind(this);
     this.updateTable = this.updateTable.bind(this);
     this.getTableDataForPaste = this.getTableDataForPaste.bind(this);
     this.updateTableOnPaste = this.updateTableOnPaste.bind(this);
@@ -69,14 +99,13 @@ class SouTable extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    const tableCol = Math.max(nextProps.minTableCol, nextProps.tableData.length, this.state.tableCol);
-    const tableRow = Math.max(nextProps.minTableRow,
-      nextProps.tableData.length > 0 ? nextProps.tableData[0].length : 0, this.state.tableRow);
-    this.setState({
+    this.setState(prevState => ({
       tableData: nextProps.tableData,
-      tableCol,
-      tableRow,
-    });
+      tableCol: Math.max(nextProps.minTableCol,
+        nextProps.tableData.length, prevState.tableCol),
+      tableRow: Math.max(nextProps.minTableRow, nextProps.tableData.length > 0
+        ? nextProps.tableData[0].length : 0, prevState.tableRow),
+    }));
   }
 
   componentDidUpdate() {
@@ -88,9 +117,9 @@ class SouTable extends Component {
 
   onContextMenu(e) {
     e.preventDefault();
-    const target = e.target;
+    const { target } = e;
     const wrapperRect = this.wrapper.getBoundingClientRect();
-    let contextMenuState = {
+    const contextMenuState = {
       xPos: e.clientX - wrapperRect.left,
       yPos: e.clientY - wrapperRect.top,
       isContextMenuHidden: false,
@@ -132,7 +161,8 @@ class SouTable extends Component {
   }
 
   selectNextCell(v, h) {
-    let { tableCol, tableRow, colIndex, rowIndex } = this.state;
+    const { tableCol, tableRow } = this.state;
+    let { colIndex, rowIndex } = this.state;
     if (h !== 0) {
       colIndex = h === -1 ? Math.max(colIndex + h, 0) : Math.min(colIndex + h, tableCol - 1);
     }
@@ -171,10 +201,8 @@ class SouTable extends Component {
       } else {
         this.showEmptyInput();
       }
-    } else {
-      if (e.key === 'Enter') {
-        this.selectNextCell(1, 0);
-      }
+    } else if (e.key === 'Enter') {
+      this.selectNextCell(1, 0);
     }
   }
 
@@ -183,7 +211,7 @@ class SouTable extends Component {
       this.hideContextMenu();
     }
     if (!this.state.isTyping) {
-      switch(e.key) {
+      switch (e.key) {
         case 'Backspace':
           if (this.state.endColIndex === undefined) {
             this.updateTable('');
@@ -213,48 +241,17 @@ class SouTable extends Component {
     }
   }
 
-  trimData(tableData) {
-    const tableDataCol = tableData.length;
-    const tableDataRow = tableData.length > 0 ? tableData[0].length : 0;
-    const newTableData = [];
-    let newTableDataCol = tableDataCol;
-    let newTableDataRow = tableDataRow;
-
-    for (let i = newTableDataCol - 1; i >= 0; i--) {
-      if (tableData[i].every(datum => datum === '')) {
-        newTableDataCol--;
-      } else {
-        break;
-      }
-    }
-    loop: {
-      for (let j = newTableDataRow - 1; j >= 0; j--) {
-        for (let i = 0; i < tableDataCol; i++) {
-          if (tableData[i][j] !== '') {
-            break loop;
-          }
-        }
-        newTableDataRow--;
-      }
-    }
-
-    for (let i = 0; i < newTableDataCol; i++) {
-      newTableData[i] = tableData[i].slice(0, newTableDataRow);
-    }
-    return newTableData;
-  }
-
   updateTable(value) {
     const { tableData, colIndex, rowIndex } = this.state;
     const newTableData = [];
     const tableDataCol = tableData.length;
     const tableDataRow = tableData.length > 0 ? tableData[0].length : 0;
-    let newTableDataCol = Math.max(colIndex + 1, tableDataCol);
-    let newTableDataRow = Math.max(rowIndex + 1, tableDataRow);
+    const newTableDataCol = Math.max(colIndex + 1, tableDataCol);
+    const newTableDataRow = Math.max(rowIndex + 1, tableDataRow);
 
-    for (let i = 0; i < newTableDataCol; i++) {
+    for (let i = 0; i < newTableDataCol; i += 1) {
       newTableData[i] = [];
-      for (let j = 0; j < newTableDataRow; j++) {
+      for (let j = 0; j < newTableDataRow; j += 1) {
         if (i === colIndex && j === rowIndex) {
           newTableData[i][j] = value;
         } else if (i < tableDataCol && j < tableDataRow) {
@@ -265,7 +262,7 @@ class SouTable extends Component {
       }
     }
 
-    const trimmedTableData = this.trimData(newTableData);
+    const trimmedTableData = trimData(newTableData);
     this.setState({
       tableData: trimmedTableData,
     });
@@ -279,12 +276,12 @@ class SouTable extends Component {
     const tableDataRow = tableData.length > 0 ? tableData[0].length : 0;
     const pasteDataCol = pasteData.length > 0 ? pasteData[0].length : 0;
     const pasteDataRow = pasteData.length;
-    let newTableDataCol = Math.max(pasteColIndex + pasteDataCol, tableDataCol);
-    let newTableDataRow = Math.max(pasteRowIndex + pasteDataRow, tableDataRow);
+    const newTableDataCol = Math.max(pasteColIndex + pasteDataCol, tableDataCol);
+    const newTableDataRow = Math.max(pasteRowIndex + pasteDataRow, tableDataRow);
 
-    for (let i = 0; i < newTableDataCol; i++) {
+    for (let i = 0; i < newTableDataCol; i += 1) {
       newTableData[i] = [];
-      for (let j = 0; j < newTableDataRow; j++) {
+      for (let j = 0; j < newTableDataRow; j += 1) {
         if (i >= pasteColIndex && i < pasteColIndex + pasteDataCol
           && j >= pasteRowIndex && j < pasteRowIndex + pasteDataRow) {
           newTableData[i][j] = pasteData[j - pasteRowIndex][i - pasteColIndex];
@@ -296,11 +293,13 @@ class SouTable extends Component {
       }
     }
 
-    return this.trimData(newTableData);
+    return trimData(newTableData);
   }
 
   updateTableOnPaste(data, selectAfterPaste = true) {
-    const { colIndex, rowIndex, endColIndex, endRowIndex } = this.state;
+    const {
+      colIndex, rowIndex, endColIndex, endRowIndex,
+    } = this.state;
     const dataCol = data[0].length;
     const dataRow = data.length;
     let pasteData = data;
@@ -312,9 +311,14 @@ class SouTable extends Component {
 
       // step 1-1: get paste cells
       // n to 1 as default
-      let pasteColIndex = colIndex, pasteRowIndex = rowIndex,
-        selectCol = 1, selectRow = 1,
-        pasteCol = dataCol, pasteRow = dataRow;
+      let pasteColIndex = colIndex; let pasteRowIndex = rowIndex;
+
+
+      let selectCol = 1; let selectRow = 1;
+
+
+      let pasteCol = dataCol; let
+        pasteRow = dataRow;
       if (endColIndex !== undefined) {
         // 1 to n, n to n
         pasteColIndex = Math.min(colIndex, endColIndex);
@@ -326,9 +330,9 @@ class SouTable extends Component {
         if (selectCol > dataCol || selectRow > dataRow) {
           // step 1-2: get paste data if select area larger than data,
           pasteData = [];
-          for (let i = 0; i < pasteRow; i++) {
+          for (let i = 0; i < pasteRow; i += 1) {
             pasteData[i] = [];
-            for (let j = 0; j < pasteCol; j++) {
+            for (let j = 0; j < pasteCol; j += 1) {
               pasteData[i][j] = data[i % dataRow][j % dataCol];
             }
           }
@@ -347,7 +351,8 @@ class SouTable extends Component {
         this.selectCell(pasteTd, {
           tableData: trimmedData,
           tableCol: Math.max(this.state.tableCol, trimmedData.length),
-          tableRow: Math.max(this.state.tableRow, trimmedData.length > 0 ? trimmedData[0].length : 0),
+          tableRow: Math.max(this.state.tableRow, trimmedData.length > 0
+            ? trimmedData[0].length : 0),
           colIndex: pasteColIndex,
           rowIndex: pasteRowIndex,
           endColIndex: pasteEndColIndex,
@@ -355,21 +360,29 @@ class SouTable extends Component {
           innerClipboardData: data,
         });
       } else {
-        this.setState({
+        this.setState(prevState => ({
           tableData: trimmedData,
-          tableCol: Math.max(this.state.tableCol, trimmedData.length),
-          tableRow: Math.max(this.state.tableRow, trimmedData.length > 0 ? trimmedData[0].length : 0),
-        });
+          tableCol: Math.max(prevState.tableCol, trimmedData.length),
+          tableRow: Math.max(prevState.tableRow, trimmedData.length > 0
+            ? trimmedData[0].length : 0),
+        }));
       }
     }
   }
 
   updateTableOnAutoPaste() {
     // step 1: get paste and select cells
-    const { colIndex, rowIndex, endColIndex, endRowIndex, dragColIndex, dragRowIndex } = this.state;
-    let pasteColIndex, pasteRowIndex,
-      pasteCol = 1, pasteRow = 1,
-      selectColIndex, selectRowIndex, selectEndColIndex, selectEndRowIndex;
+    const {
+      colIndex, rowIndex, endColIndex, endRowIndex, dragColIndex, dragRowIndex,
+    } = this.state;
+    let pasteColIndex; let pasteRowIndex;
+
+
+    let pasteCol = 1; let pasteRow = 1;
+
+
+    let selectColIndex; let selectRowIndex; let selectEndColIndex; let
+      selectEndRowIndex;
     if (endColIndex === undefined) {
       if (dragRowIndex === rowIndex) {
         // drag in row
@@ -457,9 +470,9 @@ class SouTable extends Component {
     const dataCol = copyData[0].length;
     const dataRow = copyData.length;
     const pasteData = [];
-    for (let i = 0; i < pasteRow; i++) {
+    for (let i = 0; i < pasteRow; i += 1) {
       pasteData[i] = [];
-      for (let j = 0; j < pasteCol; j++) {
+      for (let j = 0; j < pasteCol; j += 1) {
         pasteData[i][j] = copyData[i % dataRow][j % dataCol];
       }
     }
@@ -484,7 +497,7 @@ class SouTable extends Component {
       const { tableData, tableCol, colIndex } = this.state;
       if (colIndex + d < tableData.length) {
         const emptyCol = [];
-        for (let i = 0; i < tableData.length + 1; i++) {
+        for (let i = 0; i < tableData.length + 1; i += 1) {
           emptyCol.push('');
         }
         tableData.splice(colIndex + d, 0, emptyCol);
@@ -506,7 +519,7 @@ class SouTable extends Component {
       const { tableData, tableRow, rowIndex } = this.state;
       const tableDataRow = tableData.length > 0 ? tableData[0].length : 0;
       if (rowIndex + d < tableDataRow) {
-        for (let i = 0; i < tableData.length; i++) {
+        for (let i = 0; i < tableData.length; i += 1) {
           tableData[i].splice(rowIndex + d, 0, '');
         }
         this.setState({
@@ -542,7 +555,7 @@ class SouTable extends Component {
     const { tableData, tableRow, rowIndex } = this.state;
     const tableDataRow = tableData.length > 0 ? tableData[0].length : 0;
     if (rowIndex < tableDataRow) {
-      for (let i = 0; i < tableData.length; i++) {
+      for (let i = 0; i < tableData.length; i += 1) {
         tableData[i].splice(rowIndex, 1);
       }
       this.setState({
@@ -559,13 +572,13 @@ class SouTable extends Component {
 
   onMouseDown(e) {
     e.preventDefault();
-    let target = e.target;
+    const { target } = e;
     let colIndex = Number(target.getAttribute('data-col'));
     let rowIndex = Number(target.getAttribute('data-row'));
     if ((target.tagName === 'TD' || target.tagName === 'TH') && !(rowIndex === -1 && colIndex === -1)) {
       const { tableCol, tableRow } = this.state;
-      let endColIndex = undefined;
-      let endRowIndex = undefined;
+      let endColIndex;
+      let endRowIndex;
       let isMultiSelecting = false;
       if (rowIndex !== -1 && colIndex === -1) {
         colIndex = 0;
@@ -601,13 +614,12 @@ class SouTable extends Component {
 
   onMouseOver(e) {
     e.preventDefault();
-    const target = e.target;
+    const { target } = e;
     if ((target.tagName === 'TD' || target.tagName === 'TH')) {
       const targetColIndex = Number(target.getAttribute('data-col'));
       const targetRowIndex = Number(target.getAttribute('data-row'));
       if (this.mouseDownState !== undefined) {
-        const { tableCol, tableRow } = this.state;
-        const isMultiSelecting = this.state.isMultiSelecting;
+        const { tableCol, tableRow, isMultiSelecting } = this.state;
         const endColIndex = isMultiSelecting === 'row' ? tableCol - 1 : Math.max(targetColIndex, 0);
         const endRowIndex = isMultiSelecting === 'col' ? tableRow - 1 : Math.max(targetRowIndex, 0);
         if (!isMultiSelecting) {
@@ -629,11 +641,17 @@ class SouTable extends Component {
           });
         }
       } else if (this.state.isDragging) {
-        const { colIndex, rowIndex, endColIndex, endRowIndex } = this.state;
+        const {
+          colIndex, rowIndex, endColIndex, endRowIndex,
+        } = this.state;
         const willAutoPaste = endColIndex === undefined
           ? !(targetColIndex === colIndex && targetRowIndex === rowIndex)
-          : !(targetColIndex <= Math.max(colIndex, endColIndex) && targetColIndex >= Math.min(colIndex, endColIndex)
-        && targetRowIndex <= Math.max(rowIndex, endRowIndex) && targetRowIndex >= Math.min(rowIndex, endRowIndex));
+          : !(
+            targetColIndex <= Math.max(colIndex, endColIndex)
+            && targetColIndex >= Math.min(colIndex, endColIndex)
+            && targetRowIndex <= Math.max(rowIndex, endRowIndex)
+            && targetRowIndex >= Math.min(rowIndex, endRowIndex)
+          );
         if (willAutoPaste) {
           this.setState({
             dragColIndex: targetColIndex,
@@ -661,7 +679,7 @@ class SouTable extends Component {
     } else if (this.state.isDragging) {
       this.setState({
         isDragging: false,
-      })
+      });
     }
   }
 
@@ -677,9 +695,9 @@ class SouTable extends Component {
     const minRow = Math.min(rowIndex, endRowIndex);
     const maxRow = Math.max(rowIndex, endRowIndex);
     const data = [];
-    for (let i = minRow; i <= maxRow; i++) {
+    for (let i = minRow; i <= maxRow; i += 1) {
       data[i - minRow] = [];
-      for (let j = minCol; j <= maxCol; j++) {
+      for (let j = minCol; j <= maxCol; j += 1) {
         if (tableData[j] !== undefined && tableData[j][i] !== undefined) {
           data[i - minRow][j - minCol] = tableData[j][i];
         } else {
@@ -699,9 +717,9 @@ class SouTable extends Component {
     const emptyCol = Math.abs(this.state.colIndex - this.state.endColIndex) || 0;
     const emptyRow = Math.abs(this.state.rowIndex - this.state.endRowIndex) || 0;
     const emptyData = [];
-    for (let i = 0; i <= emptyRow; i++) {
+    for (let i = 0; i <= emptyRow; i += 1) {
       emptyData[i] = [];
-      for (let j = 0; j <= emptyCol; j++) {
+      for (let j = 0; j <= emptyCol; j += 1) {
         emptyData[i][j] = '';
       }
     }
@@ -757,9 +775,9 @@ class SouTable extends Component {
     const switchedTableData = [];
     const tableDataCol = tableData.length;
     const tableDataRow = tableData.length > 0 ? tableData[0].length : 0;
-    for (let i = 0; i < tableDataRow; i++) {
+    for (let i = 0; i < tableDataRow; i += 1) {
       switchedTableData[i] = [];
-      for (let j = 0; j < tableDataCol; j++) {
+      for (let j = 0; j < tableDataCol; j += 1) {
         switchedTableData[i][j] = tableData[j][i];
       }
     }
@@ -771,13 +789,11 @@ class SouTable extends Component {
     const tableDataCol = tableData.length;
     const tableDataRow = tableData.length > 0 ? tableData[0].length : 0;
     const newTableData = this.getSwitchedTableData();
-    const tableCol = Math.max(this.props.minTableCol, tableDataRow, this.state.tableCol);
-    const tableRow = Math.max(this.props.minTableRow, tableDataCol, this.state.tableRow);
-    this.setState({
+    this.setState(prevState => ({
       tableData: newTableData,
-      tableCol,
-      tableRow,
-    });
+      tableCol: Math.max(this.props.minTableCol, tableDataRow, prevState.tableCol),
+      tableRow: Math.max(this.props.minTableRow, tableDataCol, prevState.tableRow),
+    }));
     this.props.getData(newTableData);
   }
 
@@ -789,7 +805,7 @@ class SouTable extends Component {
       const restRows = switchedTableData.slice(1);
       if (inverse) {
         restRows.sort((a, b) => {
-          if (!isNaN(+a[colIndex]) && !isNaN(+b[colIndex])) {
+          if (!Number.isNaN(+a[colIndex]) && !Number.isNaN(+b[colIndex])) {
             return b[colIndex] - a[colIndex];
           }
           if (b[colIndex] < a[colIndex]) {
@@ -802,7 +818,7 @@ class SouTable extends Component {
         });
       } else {
         restRows.sort((a, b) => {
-          if (!isNaN(+a[colIndex]) && !isNaN(+b[colIndex])) {
+          if (!Number.isNaN(+a[colIndex]) && !Number.isNaN(+b[colIndex])) {
             return a[colIndex] - b[colIndex];
           }
           if (a[colIndex] < b[colIndex]) {
@@ -823,49 +839,48 @@ class SouTable extends Component {
   }
 
   onLeftHeaderScroll() {
-    const scrollTop = this.leftHeader.scrollTop;
+    const { scrollTop } = this.leftHeader;
     if (this.scrollTop !== scrollTop) {
-      this.scrollTop == scrollTop;
+      this.scrollTop = scrollTop;
       this.innerTable.scrollTop = scrollTop;
       if (scrollTop > 0) {
-        this.topHeader.style.height = (this.props.cellHeight + 1) + 'px';
+        this.topHeader.style.height = `${this.props.cellHeight + 1}px`;
         this.innerTable.style.marginTop = '-1px';
-        this.leftHeaderHead.style.height = (this.props.cellHeight + 1) + 'px';
+        this.leftHeaderHead.style.height = `${this.props.cellHeight + 1}px`;
       } else {
-        this.topHeader.style.height = this.props.cellHeight + 'px';
+        this.topHeader.style.height = `${this.props.cellHeight}px`;
         this.innerTable.style.marginTop = 0;
-        this.leftHeaderHead.style.height = this.props.cellHeight + 'px';
+        this.leftHeaderHead.style.height = `${this.props.cellHeight}px`;
       }
     }
   }
 
   onTopHeaderScroll() {
-    const scrollLeft = this.topHeader.scrollLeft;
+    const { scrollLeft } = this.topHeader;
     if (this.scrollLeft !== scrollLeft) {
       this.scrollLeft = scrollLeft;
       this.innerTable.scrollLeft = scrollLeft;
       if (scrollLeft > 0) {
-        this.leftWrapper.style.width = (this.props.minCellWidth + 1) + 'px';
+        this.leftWrapper.style.width = `${this.props.minCellWidth + 1}px`;
       } else {
-        this.leftWrapper.style.width = this.props.minCellWidth + 'px';
+        this.leftWrapper.style.width = `${this.props.minCellWidth}px`;
       }
     }
   }
 
   onInnerTableScroll() {
-    const scrollTop = this.innerTable.scrollTop;
-    const scrollLeft = this.innerTable.scrollLeft;
+    const { scrollTop, scrollLeft } = this.innerTable;
     if (this.scrollTop !== scrollTop) {
       this.scrollTop = scrollTop;
       this.leftHeader.scrollTop = scrollTop;
       if (scrollTop > 0) {
-        this.topHeader.style.height = (this.props.cellHeight + 1) + 'px';
+        this.topHeader.style.height = `${this.props.cellHeight + 1}px`;
         this.innerTable.style.marginTop = '-1px';
-        this.leftHeaderHead.style.height = (this.props.cellHeight + 1) + 'px';
+        this.leftHeaderHead.style.height = `${this.props.cellHeight + 1}px`;
       } else {
-        this.topHeader.style.height = this.props.cellHeight + 'px';
+        this.topHeader.style.height = `${this.props.cellHeight}px`;
         this.innerTable.style.marginTop = 0;
-        this.leftHeaderHead.style.height = this.props.cellHeight + 'px';
+        this.leftHeaderHead.style.height = `${this.props.cellHeight}px`;
       }
     }
 
@@ -873,22 +888,26 @@ class SouTable extends Component {
       this.scrollLeft = scrollLeft;
       this.topHeader.scrollLeft = scrollLeft;
       if (scrollLeft > 0) {
-        this.leftWrapper.style.width = (this.props.minCellWidth + 1) + 'px';
+        this.leftWrapper.style.width = `${this.props.minCellWidth + 1}px`;
       } else {
-        this.leftWrapper.style.width = this.props.minCellWidth + 'px';
+        this.leftWrapper.style.width = `${this.props.minCellWidth}px`;
       }
     }
   }
 
   renderTable() {
-    let { tableData, tableCol, tableRow, colIndex, rowIndex, endColIndex, endRowIndex } = this.state;
-    const { width, height, minCellWidth, cellHeight } = this.props;
+    const {
+      tableData, tableCol, tableRow, colIndex, rowIndex, endColIndex, endRowIndex,
+    } = this.state;
+    const {
+      width, height, minCellWidth, cellHeight,
+    } = this.props;
     const cellStyle = {
-      minWidth: minCellWidth + 'px',
-      height: cellHeight + 'px',
+      minWidth: `${minCellWidth}px`,
+      height: `${cellHeight}px`,
     };
     const leftHeaderRows = [];
-    for (let j = 0; j < tableRow; j++) {
+    for (let j = 0; j < tableRow; j += 1) {
       const isRowIncluded = endRowIndex !== undefined ? (j >= Math.min(rowIndex, endRowIndex)
       && j <= Math.max(rowIndex, endRowIndex)) : (j === rowIndex);
       leftHeaderRows.push(
@@ -901,12 +920,12 @@ class SouTable extends Component {
           >
             {j}
           </td>
-        </tr>
+        </tr>,
       );
     }
 
     const ths = [];
-    for (let i = 1; i <= tableCol; i++) {
+    for (let i = 1; i <= tableCol; i += 1) {
       const isColIncluded = endColIndex !== undefined ? (i - 1 >= Math.min(colIndex, endColIndex)
       && i - 1 <= Math.max(colIndex, endColIndex)) : (i - 1 === colIndex);
       ths.push(
@@ -918,14 +937,14 @@ class SouTable extends Component {
           className={isColIncluded ? 'sou-selected-cell-indicator' : ''}
         >
           {i > 26 && String.fromCharCode(Math.floor((i - 1) / 26) + 64)}
-          {String.fromCharCode((i - 1) % 26 + 65)}
-        </th>
+          {String.fromCharCode(((i - 1) % 26) + 65)}
+        </th>,
       );
     }
 
     const rows = [];
-    for (let j = 0; j < tableRow; j++) {
-      let row = (
+    for (let j = 0; j < tableRow; j += 1) {
+      const row = (
         <tr key={j}>
           {ths.map((col, index) => {
             const isCurrent = index === colIndex && j === rowIndex;
@@ -935,7 +954,7 @@ class SouTable extends Component {
               && j <= Math.max(rowIndex, endRowIndex);
             return (
               <td
-                key={index + 1}
+                key={index + 1} // eslint-disable-line
                 style={cellStyle}
                 data-col={index}
                 data-row={j}
@@ -947,7 +966,9 @@ class SouTable extends Component {
                     type="text"
                     className="sou-input"
                     style={{ zIndex: this.state.isTyping ? 100 : -100 }}
-                    ref={input => this.input = input}
+                    ref={(input) => {
+                      this.input = input;
+                    }}
                     value={this.state.inputValue}
                     onChange={this.onChangeInputValue}
                     onKeyPress={this.onInputKeyPress}
@@ -976,16 +997,20 @@ class SouTable extends Component {
           style={{
             width: minCellWidth,
           }}
-          ref={leftWrapper => this.leftWrapper = leftWrapper}
+          ref={(leftWrapper) => {
+            this.leftWrapper = leftWrapper;
+          }}
         >
           <table
             className="sou-table-left-header"
           >
             <thead
               style={{
-                height: cellHeight + 'px',
+                height: `${cellHeight}px`,
               }}
-              ref={leftHeaderHead => this.leftHeaderHead = leftHeaderHead}
+              ref={(leftHeaderHead) => {
+                this.leftHeaderHead = leftHeaderHead;
+              }}
             >
               <tr>
                 <th
@@ -1003,13 +1028,15 @@ class SouTable extends Component {
             <tbody
               style={{
                 marginTop: cellHeight,
-                height: (height - cellHeight) + 'px',
+                height: `${height - cellHeight}px`,
               }}
               onContextMenu={this.onContextMenu}
               onMouseDown={this.onMouseDown}
               onMouseOver={this.onMouseOver}
               onMouseUp={this.onMouseUp}
-              ref={leftHeader => this.leftHeader = leftHeader}
+              ref={(leftHeader) => {
+                this.leftHeader = leftHeader;
+              }}
               onScroll={this.onLeftHeaderScroll}
             >
               {leftHeaderRows}
@@ -1021,10 +1048,12 @@ class SouTable extends Component {
           <div
             className="right-top-wrapper"
             style={{
-              width: (width - minCellWidth - 1) + 'px',
-              height: cellHeight + 'px',
+              width: `${width - minCellWidth - 1}px`,
+              height: `${cellHeight}px`,
             }}
-            ref={topHeader => this.topHeader = topHeader}
+            ref={(topHeader) => {
+              this.topHeader = topHeader;
+            }}
             onScroll={this.onTopHeaderScroll}
           >
             <table
@@ -1045,16 +1074,20 @@ class SouTable extends Component {
           <div
             className="right-bottom-wrapper"
             style={{
-              width: (width - minCellWidth - 1) + 'px',
-              height: (height - cellHeight) + 'px',
+              width: `${width - minCellWidth - 1}px`,
+              height: `${height - cellHeight}px`,
             }}
-            ref={innerTable => this.innerTable = innerTable}
+            ref={(innerTable) => {
+              this.innerTable = innerTable;
+            }}
             onScroll={this.onInnerTableScroll}
           >
             <div className="inner-wrapper">
               <table
                 className="sou-table"
-                ref={table => this.table = table}
+                ref={(table) => {
+                  this.table = table;
+                }}
                 onContextMenu={this.onContextMenu}
                 onMouseDown={this.onMouseDown}
                 onMouseOver={this.onMouseOver}
@@ -1083,10 +1116,10 @@ class SouTable extends Component {
     const ths = theadTr.children;
     const tbodyTr = document.querySelector('.sou-table > tbody > tr');
     const tds = tbodyTr.children;
-    theadTr.style.width = (tbodyTr.offsetWidth + 1) + 'px';
-    ths[0].style.width = (tds[0].offsetWidth + 1) + 'px';
-    for (let i = 1; i < tableCol; i++) {
-      ths[i].style.width = tds[i].offsetWidth + 'px';
+    theadTr.style.width = `${tbodyTr.offsetWidth + 1}px`;
+    ths[0].style.width = `${tds[0].offsetWidth + 1}px`;
+    for (let i = 1; i < tableCol; i += 1) {
+      ths[i].style.width = `${tds[i].offsetWidth}px`;
     }
   }
 
@@ -1094,18 +1127,21 @@ class SouTable extends Component {
     return (
       <div
         className="sou-borders"
-        onMouseDown={(e) => e.preventDefault()}
+        onMouseDown={e => e.preventDefault()}
         onMouseUp={this.onMouseUp}
-        onContextMenu={(e) => e.preventDefault()}
+        onContextMenu={e => e.preventDefault()}
       >
-        {this.state.dragColIndex !== undefined && <div className="sou-paste-borders">
+        {this.state.dragColIndex !== undefined && (
+        <div className="sou-paste-borders">
           <div />
           <div />
           <div />
           <div />
-        </div>}
+        </div>
+        )}
 
-        {this.state.endColIndex !== undefined && <div className="sou-area-borders">
+        {this.state.endColIndex !== undefined && (
+        <div className="sou-area-borders">
           <div />
           <div />
           <div />
@@ -1114,27 +1150,36 @@ class SouTable extends Component {
             className="sou-drag-grip"
             onMouseDown={this.onGripMouseDown}
           />
-        </div>}
+        </div>
+        )}
 
-        {this.state.colIndex !== undefined && <div className="sou-current-borders">
+        {this.state.colIndex !== undefined && (
+        <div className="sou-current-borders">
           <div />
           <div />
           <div />
           <div />
 
-          {this.state.endColIndex === undefined && <div
+          {this.state.endColIndex === undefined && (
+          <div
             className="sou-drag-grip"
             onMouseDown={this.onGripMouseDown}
-          />}
-        </div>}
+          />
+          )}
+        </div>
+        )}
       </div>
     );
   }
 
   styleBorders() {
-    const { colIndex, rowIndex, endColIndex, endRowIndex, dragColIndex, dragRowIndex } = this.state;
+    const {
+      colIndex, rowIndex, endColIndex, endRowIndex, dragColIndex, dragRowIndex,
+    } = this.state;
     const currentTd = this.table.querySelector(`[data-col='${colIndex}'][data-row='${rowIndex}']`);
-    const { offsetTop, offsetLeft, offsetWidth, offsetHeight } = currentTd;
+    const {
+      offsetTop, offsetLeft, offsetWidth, offsetHeight,
+    } = currentTd;
 
     const currentBorders = document.querySelectorAll('.sou-current-borders > div');
     currentBorders[0].setAttribute('style', `top: ${offsetTop}px; left: ${offsetLeft}px; width: ${offsetWidth}px; height: 2px;`);
@@ -1142,8 +1187,16 @@ class SouTable extends Component {
     currentBorders[2].setAttribute('style', `top: ${offsetTop + offsetHeight - 1}px; left: ${offsetLeft}px; width: ${offsetWidth}px; height: 2px;`);
     currentBorders[3].setAttribute('style', `top: ${offsetTop}px; left: ${offsetLeft}px; width: 2px; height: ${offsetHeight}px;`);
 
-    let multiSelectOffsetTop, multiSelectOffsetLeft, multiSelectOffsetWidth, multiSelectOffsetHeight,
-      autoPasteOffsetTop, autoPasteOffsetLeft, autoPasteOffsetWidth, autoPasteOffsetHeight;
+    let multiSelectOffsetTop;
+    let multiSelectOffsetLeft;
+    let multiSelectOffsetWidth;
+    let multiSelectOffsetHeight;
+
+
+    let autoPasteOffsetTop;
+    let autoPasteOffsetLeft;
+    let autoPasteOffsetWidth;
+    let autoPasteOffsetHeight;
 
     if (endColIndex !== undefined) {
       const endTd = this.table.querySelector(`[data-col='${endColIndex}'][data-row='${endRowIndex}']`);
@@ -1153,10 +1206,10 @@ class SouTable extends Component {
       const endOffsetHeight = endTd.offsetHeight;
       multiSelectOffsetTop = Math.min(offsetTop, endOffsetTop);
       multiSelectOffsetLeft = Math.min(offsetLeft, endOffsetLeft);
-      multiSelectOffsetWidth = offsetLeft >= endOffsetLeft ? offsetLeft - endOffsetLeft + offsetWidth
-        : endOffsetLeft - offsetLeft + endOffsetWidth;
-      multiSelectOffsetHeight = offsetTop >= endOffsetTop ? offsetTop - endOffsetTop + offsetHeight
-        : endOffsetTop - offsetTop + endOffsetHeight;
+      multiSelectOffsetWidth = offsetLeft >= endOffsetLeft
+        ? offsetLeft - endOffsetLeft + offsetWidth : endOffsetLeft - offsetLeft + endOffsetWidth;
+      multiSelectOffsetHeight = offsetTop >= endOffsetTop
+        ? offsetTop - endOffsetTop + offsetHeight : endOffsetTop - offsetTop + endOffsetHeight;
 
       const areaBorders = document.querySelectorAll('.sou-area-borders > div');
       areaBorders[0].setAttribute('style', `top: ${multiSelectOffsetTop}px; left: ${multiSelectOffsetLeft}px; width: ${multiSelectOffsetWidth}px; height: 1px;`);
@@ -1189,51 +1242,47 @@ class SouTable extends Component {
             autoPasteOffsetWidth = offsetLeft - dragOffsetLeft;
             autoPasteOffsetHeight = offsetHeight;
           }
+        } else if (dragRowIndex < rowIndex) {
+          // drag up
+          autoPasteOffsetTop = dragOffsetTop;
+          autoPasteOffsetLeft = offsetLeft;
+          autoPasteOffsetWidth = offsetWidth;
+          autoPasteOffsetHeight = offsetTop - dragOffsetTop;
         } else {
-          if (dragRowIndex < rowIndex) {
-            // drag up
-            autoPasteOffsetTop = dragOffsetTop;
-            autoPasteOffsetLeft = offsetLeft;
-            autoPasteOffsetWidth = offsetWidth;
-            autoPasteOffsetHeight = offsetTop - dragOffsetTop;
-          } else {
-            // drag down
-            autoPasteOffsetTop = offsetTop + offsetHeight;
-            autoPasteOffsetLeft = offsetLeft;
-            autoPasteOffsetWidth = offsetWidth;
-            autoPasteOffsetHeight = dragOffsetTop + dragOffsetHeight - autoPasteOffsetTop;
-          }
+          // drag down
+          autoPasteOffsetTop = offsetTop + offsetHeight;
+          autoPasteOffsetLeft = offsetLeft;
+          autoPasteOffsetWidth = offsetWidth;
+          autoPasteOffsetHeight = dragOffsetTop + dragOffsetHeight - autoPasteOffsetTop;
         }
+      } else if (dragRowIndex <= Math.max(rowIndex, endRowIndex)
+        && dragRowIndex >= Math.min(rowIndex, endRowIndex)
+      ) {
+        if (dragColIndex > Math.max(colIndex, endColIndex)) {
+          // drag right
+          autoPasteOffsetTop = multiSelectOffsetTop;
+          autoPasteOffsetLeft = multiSelectOffsetLeft + multiSelectOffsetWidth;
+          autoPasteOffsetWidth = dragOffsetLeft + dragOffsetWidth - autoPasteOffsetLeft;
+          autoPasteOffsetHeight = multiSelectOffsetHeight;
+        } else {
+          // drag left
+          autoPasteOffsetTop = multiSelectOffsetTop;
+          autoPasteOffsetLeft = dragOffsetLeft;
+          autoPasteOffsetWidth = multiSelectOffsetLeft - dragOffsetLeft;
+          autoPasteOffsetHeight = multiSelectOffsetHeight;
+        }
+      } else if (dragRowIndex < Math.min(rowIndex, endRowIndex)) {
+        // drag up
+        autoPasteOffsetTop = dragOffsetTop;
+        autoPasteOffsetLeft = multiSelectOffsetLeft;
+        autoPasteOffsetWidth = multiSelectOffsetWidth;
+        autoPasteOffsetHeight = multiSelectOffsetTop - dragOffsetTop;
       } else {
-        if (dragRowIndex <= Math.max(rowIndex, endRowIndex) && dragRowIndex >= Math.min(rowIndex, endRowIndex)) {
-          if (dragColIndex > Math.max(colIndex, endColIndex)) {
-            // drag right
-            autoPasteOffsetTop = multiSelectOffsetTop;
-            autoPasteOffsetLeft = multiSelectOffsetLeft + multiSelectOffsetWidth;
-            autoPasteOffsetWidth = dragOffsetLeft + dragOffsetWidth - autoPasteOffsetLeft;
-            autoPasteOffsetHeight = multiSelectOffsetHeight;
-          } else {
-            // drag left
-            autoPasteOffsetTop = multiSelectOffsetTop;
-            autoPasteOffsetLeft = dragOffsetLeft;
-            autoPasteOffsetWidth = multiSelectOffsetLeft - dragOffsetLeft;
-            autoPasteOffsetHeight = multiSelectOffsetHeight;
-          }
-        } else {
-          if (dragRowIndex < Math.min(rowIndex, endRowIndex)) {
-            // drag up
-            autoPasteOffsetTop = dragOffsetTop;
-            autoPasteOffsetLeft = multiSelectOffsetLeft;
-            autoPasteOffsetWidth = multiSelectOffsetWidth;
-            autoPasteOffsetHeight = multiSelectOffsetTop - dragOffsetTop;
-          } else {
-            // drag down
-            autoPasteOffsetTop = multiSelectOffsetTop + multiSelectOffsetHeight;
-            autoPasteOffsetLeft = multiSelectOffsetLeft;
-            autoPasteOffsetWidth = multiSelectOffsetWidth;
-            autoPasteOffsetHeight = dragOffsetTop + dragOffsetHeight - autoPasteOffsetTop;
-          }
-        }
+        // drag down
+        autoPasteOffsetTop = multiSelectOffsetTop + multiSelectOffsetHeight;
+        autoPasteOffsetLeft = multiSelectOffsetLeft;
+        autoPasteOffsetWidth = multiSelectOffsetWidth;
+        autoPasteOffsetHeight = dragOffsetTop + dragOffsetHeight - autoPasteOffsetTop;
       }
 
       const pasteBorders = document.querySelectorAll('.sou-paste-borders > div');
@@ -1248,12 +1297,16 @@ class SouTable extends Component {
     return (
       <ul
         style={{
-          top: this.state.yPos + 'px',
-          left: this.state.xPos + 'px',
+          top: `${this.state.yPos}px`,
+          left: `${this.state.xPos}px`,
           display: this.state.isContextMenuHidden ? 'none' : 'block',
         }}
         className="sou-context"
         onClick={() => {
+          this.hideContextMenu();
+          this.input.select();
+        }}
+        onKeyPress={() => {
           this.hideContextMenu();
           this.input.select();
         }}
@@ -1262,6 +1315,7 @@ class SouTable extends Component {
         <li
           key="1"
           onClick={this.copy}
+          onKeyPress={this.copy}
         >
           <span>Copy</span>
         </li>
@@ -1269,6 +1323,7 @@ class SouTable extends Component {
         <li
           key="2"
           onClick={this.cut}
+          onKeyPress={this.cut}
         >
           <span>Cut</span>
         </li>
@@ -1276,6 +1331,7 @@ class SouTable extends Component {
         <li
           key="3"
           onClick={this.paste}
+          onKeyPress={this.paste}
         >
           <span>Paste</span>
         </li>
@@ -1285,6 +1341,7 @@ class SouTable extends Component {
         <li
           key="4"
           onClick={this.insertRow(0)}
+          onKeyPress={this.insertRow(0)}
         >
           <span>Insert row above</span>
         </li>
@@ -1292,6 +1349,7 @@ class SouTable extends Component {
         <li
           key="5"
           onClick={this.insertRow(1)}
+          onKeyPress={this.insertRow(1)}
         >
           <span>Insert row below</span>
         </li>
@@ -1299,6 +1357,7 @@ class SouTable extends Component {
         <li
           key="6"
           onClick={this.deleteRow}
+          onKeyPress={this.deleteRow}
         >
           <span>Delete row</span>
         </li>
@@ -1308,6 +1367,7 @@ class SouTable extends Component {
         <li
           key="7"
           onClick={this.insertCol(0)}
+          onKeyPress={this.insertCol(0)}
         >
           <span>Insert column left</span>
         </li>
@@ -1315,6 +1375,7 @@ class SouTable extends Component {
         <li
           key="8"
           onClick={this.insertCol(1)}
+          onKeyPress={this.insertCol(1)}
         >
           <span>Insert column right</span>
         </li>
@@ -1322,6 +1383,7 @@ class SouTable extends Component {
         <li
           key="9"
           onClick={this.deleteCol}
+          onKeyPress={this.deleteCol}
         >
           <span>Delete column</span>
         </li>
@@ -1331,6 +1393,7 @@ class SouTable extends Component {
         <li
           key="10"
           onClick={this.clearCells}
+          onKeyPress={this.clearCells}
         >
           <span>Clear</span>
         </li>
@@ -1340,6 +1403,7 @@ class SouTable extends Component {
         <li
           key="11"
           onClick={this.sort()}
+          onKeyPress={this.sort()}
         >
           <span>Sort A-Z</span>
         </li>
@@ -1347,6 +1411,7 @@ class SouTable extends Component {
         <li
           key="12"
           onClick={this.sort(true)}
+          onKeyPress={this.sort(true)}
         >
           <span>Sort Z-A</span>
         </li>
@@ -1360,10 +1425,12 @@ class SouTable extends Component {
       <div
         className="sou-table-wrapper"
         style={{
-          width: width === undefined ? 'auto' : width + 'px',
-          height: height === undefined ? 'auto' : height + 'px',
+          width: width === undefined ? 'auto' : `${width}px`,
+          height: height === undefined ? 'auto' : `${height}px`,
         }}
-        ref={wrapper => this.wrapper = wrapper}
+        ref={(wrapper) => {
+          this.wrapper = wrapper;
+        }}
       >
         {this.renderTable()}
         {this.renderContext()}
@@ -1376,21 +1443,21 @@ SouTable.defaultProps = {
   tableData: [
     ['City', 'Beijing', 'Shanghai', 'Guangzhou'],
     ['Temperature', '5', '22', '29'],
-    ['Weather', 'Windy', 'Sunny', 'Rainy']
+    ['Weather', 'Windy', 'Sunny', 'Rainy'],
   ],
   minTableCol: 10,
   minTableRow: 21,
   minCellWidth: 50,
   cellHeight: 28,
-  getData: (data) => {
-    console.log(data)
+  getData: function getData(data) {
+    console.log(data);
   },
 };
 
 SouTable.propTypes = {
-  tableData: PropTypes.array,
-  width: PropTypes.number,
-  height: PropTypes.number,
+  tableData: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.string)),
+  width: PropTypes.number, // eslint-disable-line
+  height: PropTypes.number, // eslint-disable-line
   minTableCol: PropTypes.number,
   minTableRow: PropTypes.number,
   minCellWidth: PropTypes.number,

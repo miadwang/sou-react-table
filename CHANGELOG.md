@@ -1,3 +1,11 @@
+## 0.1.5
+
+`2018-11-22`
+
+- Support React 16
+- Fix bug: typos on homepage
+
+
 ## 0.1.4
 
 `2017-3-12`
@@ -6,6 +14,7 @@
 - New featureL styling cell width / height
 - Fix bug: typos in README Usage
 
+
 ## 0.1.3
 
 `2017-3-8`
@@ -13,11 +22,12 @@
 - Fix bug: wrong position of context menu and borders
 - Add demo in [project website](https://miadwang.github.io/sou-react-table)
 
+
 ## 0.1.2
 
 `2017-3-3`
 
-Correct Usage in README
+- Fix bug: a mistake in README
 
 
 ## 0.1.1

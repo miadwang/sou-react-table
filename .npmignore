@@ -1,6 +1,9 @@
 src
+stories
+package-lock.json
 .babelrc
+.eslintrc
+.gitignore
 .idea
 .config.yml
-.scripts
 .storybook
