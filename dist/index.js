@@ -1,2 +1,13 @@
-import SouTable from './SouTable';
-export default SouTable;
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _SouTable = _interopRequireDefault(require("./SouTable"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var _default = _SouTable.default;
+exports.default = _default;

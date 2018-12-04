@@ -1,10 +1,35 @@
-import _classCallCheck from "/Users/Ding/Documents/projects/sou-react-table/node_modules/babel-preset-react-app/node_modules/@babel/runtime/helpers/esm/classCallCheck";
-import _createClass from "/Users/Ding/Documents/projects/sou-react-table/node_modules/babel-preset-react-app/node_modules/@babel/runtime/helpers/esm/createClass";
-import _possibleConstructorReturn from "/Users/Ding/Documents/projects/sou-react-table/node_modules/babel-preset-react-app/node_modules/@babel/runtime/helpers/esm/possibleConstructorReturn";
-import _getPrototypeOf from "/Users/Ding/Documents/projects/sou-react-table/node_modules/babel-preset-react-app/node_modules/@babel/runtime/helpers/esm/getPrototypeOf";
-import _inherits from "/Users/Ding/Documents/projects/sou-react-table/node_modules/babel-preset-react-app/node_modules/@babel/runtime/helpers/esm/inherits";
-import _assertThisInitialized from "/Users/Ding/Documents/projects/sou-react-table/node_modules/babel-preset-react-app/node_modules/@babel/runtime/helpers/esm/assertThisInitialized";
-import React, { Component } from 'react';
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _react = _interopRequireWildcard(require("react"));
+
+var _propTypes = _interopRequireDefault(require("prop-types"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
+
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
 
 var trimData = function trimData(tableData) {
   var tableDataCol = tableData.length;
@@ -1105,9 +1130,9 @@ function (_Component) {
 
       for (var j = 0; j < tableRow; j += 1) {
         var isRowIncluded = endRowIndex !== undefined ? j >= Math.min(rowIndex, endRowIndex) && j <= Math.max(rowIndex, endRowIndex) : j === rowIndex;
-        leftHeaderRows.push(React.createElement("tr", {
+        leftHeaderRows.push(_react.default.createElement("tr", {
           key: j
-        }, React.createElement("td", {
+        }, _react.default.createElement("td", {
           style: cellStyle,
           "data-col": -1,
           "data-row": j,
@@ -1119,7 +1144,7 @@ function (_Component) {
 
       for (var i = 1; i <= tableCol; i += 1) {
         var isColIncluded = endColIndex !== undefined ? i - 1 >= Math.min(colIndex, endColIndex) && i - 1 <= Math.max(colIndex, endColIndex) : i - 1 === colIndex;
-        ths.push(React.createElement("th", {
+        ths.push(_react.default.createElement("th", {
           key: i,
           style: cellStyle,
           "data-col": i - 1,
@@ -1131,21 +1156,21 @@ function (_Component) {
       var rows = [];
 
       var _loop = function _loop(_j) {
-        var row = React.createElement("tr", {
+        var row = _react.default.createElement("tr", {
           key: _j
         }, ths.map(function (col, index) {
           var isCurrent = index === colIndex && _j === rowIndex;
 
           var isMultiSelected = index >= Math.min(colIndex, endColIndex) && index <= Math.max(colIndex, endColIndex) && _j >= Math.min(rowIndex, endRowIndex) && _j <= Math.max(rowIndex, endRowIndex);
 
-          return React.createElement("td", {
+          return _react.default.createElement("td", {
             key: index + 1 // eslint-disable-line
             ,
             style: cellStyle,
             "data-col": index,
             "data-row": _j,
             className: isMultiSelected ? 'sou-selected-cell' : ''
-          }, tableData[index] !== undefined ? tableData[index][_j] : '', isCurrent && React.createElement("input", {
+          }, tableData[index] !== undefined ? tableData[index][_j] : '', isCurrent && _react.default.createElement("input", {
             type: "text",
             className: "sou-input",
             style: {
@@ -1178,6 +1203,7 @@ function (_Component) {
             onPaste: _this7.onPaste
           }));
         }));
+
         rows.push(row);
       };
 
@@ -1185,7 +1211,7 @@ function (_Component) {
         _loop(_j);
       }
 
-      return React.createElement("div", null, React.createElement("div", {
+      return _react.default.createElement("div", null, _react.default.createElement("div", {
         className: "left-wrapper",
         style: {
           width: minCellWidth
@@ -1193,16 +1219,16 @@ function (_Component) {
         ref: function ref(leftWrapper) {
           _this7.leftWrapper = leftWrapper;
         }
-      }, React.createElement("table", {
+      }, _react.default.createElement("table", {
         className: "sou-table-left-header"
-      }, React.createElement("thead", {
+      }, _react.default.createElement("thead", {
         style: {
           height: "".concat(cellHeight, "px")
         },
         ref: function ref(leftHeaderHead) {
           _this7.leftHeaderHead = leftHeaderHead;
         }
-      }, React.createElement("tr", null, React.createElement("th", {
+      }, _react.default.createElement("tr", null, _react.default.createElement("th", {
         style: cellStyle,
         "data-col": -1,
         "data-row": -1,
@@ -1210,7 +1236,7 @@ function (_Component) {
         onContextMenu: function onContextMenu(e) {
           return e.preventDefault();
         }
-      }, "switch"))), React.createElement("tbody", {
+      }, "switch"))), _react.default.createElement("tbody", {
         style: {
           marginTop: cellHeight,
           height: "".concat(height - cellHeight, "px")
@@ -1223,9 +1249,9 @@ function (_Component) {
           _this7.leftHeader = leftHeader;
         },
         onScroll: this.onLeftHeaderScroll
-      }, leftHeaderRows))), React.createElement("div", {
+      }, leftHeaderRows))), _react.default.createElement("div", {
         className: "right-wrapper"
-      }, React.createElement("div", {
+      }, _react.default.createElement("div", {
         className: "right-top-wrapper",
         style: {
           width: "".concat(width - minCellWidth - 1, "px"),
@@ -1235,13 +1261,13 @@ function (_Component) {
           _this7.topHeader = topHeader;
         },
         onScroll: this.onTopHeaderScroll
-      }, React.createElement("table", {
+      }, _react.default.createElement("table", {
         className: "sou-table",
         onContextMenu: this.onContextMenu,
         onMouseDown: this.onMouseDown,
         onMouseOver: this.onMouseOver,
         onMouseUp: this.onMouseUp
-      }, React.createElement("thead", null, React.createElement("tr", null, ths)))), React.createElement("div", {
+      }, _react.default.createElement("thead", null, _react.default.createElement("tr", null, ths)))), _react.default.createElement("div", {
         className: "right-bottom-wrapper",
         style: {
           width: "".concat(width - minCellWidth - 1, "px"),
@@ -1251,9 +1277,9 @@ function (_Component) {
           _this7.innerTable = innerTable;
         },
         onScroll: this.onInnerTableScroll
-      }, React.createElement("div", {
+      }, _react.default.createElement("div", {
         className: "inner-wrapper"
-      }, React.createElement("table", {
+      }, _react.default.createElement("table", {
         className: "sou-table",
         ref: function ref(table) {
           _this7.table = table;
@@ -1262,7 +1288,7 @@ function (_Component) {
         onMouseDown: this.onMouseDown,
         onMouseOver: this.onMouseOver,
         onMouseUp: this.onMouseUp
-      }, React.createElement("tbody", {
+      }, _react.default.createElement("tbody", {
         onDoubleClick: function onDoubleClick() {
           _this7.showInput();
         }
@@ -1286,7 +1312,7 @@ function (_Component) {
   }, {
     key: "renderBorders",
     value: function renderBorders() {
-      return React.createElement("div", {
+      return _react.default.createElement("div", {
         className: "sou-borders",
         onMouseDown: function onMouseDown(e) {
           return e.preventDefault();
@@ -1295,16 +1321,16 @@ function (_Component) {
         onContextMenu: function onContextMenu(e) {
           return e.preventDefault();
         }
-      }, this.state.dragColIndex !== undefined && React.createElement("div", {
+      }, this.state.dragColIndex !== undefined && _react.default.createElement("div", {
         className: "sou-paste-borders"
-      }, React.createElement("div", null), React.createElement("div", null), React.createElement("div", null), React.createElement("div", null)), this.state.endColIndex !== undefined && React.createElement("div", {
+      }, _react.default.createElement("div", null), _react.default.createElement("div", null), _react.default.createElement("div", null), _react.default.createElement("div", null)), this.state.endColIndex !== undefined && _react.default.createElement("div", {
         className: "sou-area-borders"
-      }, React.createElement("div", null), React.createElement("div", null), React.createElement("div", null), React.createElement("div", null), React.createElement("div", {
+      }, _react.default.createElement("div", null), _react.default.createElement("div", null), _react.default.createElement("div", null), _react.default.createElement("div", null), _react.default.createElement("div", {
         className: "sou-drag-grip",
         onMouseDown: this.onGripMouseDown
-      })), this.state.colIndex !== undefined && React.createElement("div", {
+      })), this.state.colIndex !== undefined && _react.default.createElement("div", {
         className: "sou-current-borders"
-      }, React.createElement("div", null), React.createElement("div", null), React.createElement("div", null), React.createElement("div", null), this.state.endColIndex === undefined && React.createElement("div", {
+      }, _react.default.createElement("div", null), _react.default.createElement("div", null), _react.default.createElement("div", null), _react.default.createElement("div", null), this.state.endColIndex === undefined && _react.default.createElement("div", {
         className: "sou-drag-grip",
         onMouseDown: this.onGripMouseDown
       })));
@@ -1433,7 +1459,7 @@ function (_Component) {
     value: function renderContext() {
       var _this8 = this;
 
-      return React.createElement("ul", {
+      return _react.default.createElement("ul", {
         style: {
           top: "".concat(this.state.yPos, "px"),
           left: "".concat(this.state.xPos, "px"),
@@ -1453,67 +1479,67 @@ function (_Component) {
         onContextMenu: function onContextMenu(e) {
           return e.preventDefault();
         }
-      }, React.createElement("li", {
+      }, _react.default.createElement("li", {
         key: "1",
         onClick: this.copy,
         onKeyPress: this.copy
-      }, React.createElement("span", null, "Copy")), React.createElement("li", {
+      }, _react.default.createElement("span", null, "Copy")), _react.default.createElement("li", {
         key: "2",
         onClick: this.cut,
         onKeyPress: this.cut
-      }, React.createElement("span", null, "Cut")), React.createElement("li", {
+      }, _react.default.createElement("span", null, "Cut")), _react.default.createElement("li", {
         key: "3",
         onClick: this.paste,
         onKeyPress: this.paste
-      }, React.createElement("span", null, "Paste")), React.createElement("div", {
+      }, _react.default.createElement("span", null, "Paste")), _react.default.createElement("div", {
         key: "d1",
         className: "divider"
-      }), React.createElement("li", {
+      }), _react.default.createElement("li", {
         key: "4",
         onClick: this.insertRow(0),
         onKeyPress: this.insertRow(0)
-      }, React.createElement("span", null, "Insert row above")), React.createElement("li", {
+      }, _react.default.createElement("span", null, "Insert row above")), _react.default.createElement("li", {
         key: "5",
         onClick: this.insertRow(1),
         onKeyPress: this.insertRow(1)
-      }, React.createElement("span", null, "Insert row below")), React.createElement("li", {
+      }, _react.default.createElement("span", null, "Insert row below")), _react.default.createElement("li", {
         key: "6",
         onClick: this.deleteRow,
         onKeyPress: this.deleteRow
-      }, React.createElement("span", null, "Delete row")), React.createElement("div", {
+      }, _react.default.createElement("span", null, "Delete row")), _react.default.createElement("div", {
         key: "d2",
         className: "divider"
-      }), React.createElement("li", {
+      }), _react.default.createElement("li", {
         key: "7",
         onClick: this.insertCol(0),
         onKeyPress: this.insertCol(0)
-      }, React.createElement("span", null, "Insert column left")), React.createElement("li", {
+      }, _react.default.createElement("span", null, "Insert column left")), _react.default.createElement("li", {
         key: "8",
         onClick: this.insertCol(1),
         onKeyPress: this.insertCol(1)
-      }, React.createElement("span", null, "Insert column right")), React.createElement("li", {
+      }, _react.default.createElement("span", null, "Insert column right")), _react.default.createElement("li", {
         key: "9",
         onClick: this.deleteCol,
         onKeyPress: this.deleteCol
-      }, React.createElement("span", null, "Delete column")), React.createElement("div", {
+      }, _react.default.createElement("span", null, "Delete column")), _react.default.createElement("div", {
         key: "d3",
         className: "divider"
-      }), React.createElement("li", {
+      }), _react.default.createElement("li", {
         key: "10",
         onClick: this.clearCells,
         onKeyPress: this.clearCells
-      }, React.createElement("span", null, "Clear")), React.createElement("div", {
+      }, _react.default.createElement("span", null, "Clear")), _react.default.createElement("div", {
         key: "d4",
         className: "divider"
-      }), React.createElement("li", {
+      }), _react.default.createElement("li", {
         key: "11",
         onClick: this.sort(),
         onKeyPress: this.sort()
-      }, React.createElement("span", null, "Sort A-Z")), React.createElement("li", {
+      }, _react.default.createElement("span", null, "Sort A-Z")), _react.default.createElement("li", {
         key: "12",
         onClick: this.sort(true),
         onKeyPress: this.sort(true)
-      }, React.createElement("span", null, "Sort Z-A")));
+      }, _react.default.createElement("span", null, "Sort Z-A")));
     }
   }, {
     key: "render",
@@ -1523,7 +1549,7 @@ function (_Component) {
       var _this$props2 = this.props,
           width = _this$props2.width,
           height = _this$props2.height;
-      return React.createElement("div", {
+      return _react.default.createElement("div", {
         className: "sou-table-wrapper",
         style: {
           width: width === undefined ? 'auto' : "".concat(width, "px"),
@@ -1537,7 +1563,7 @@ function (_Component) {
   }]);
 
   return SouTable;
-}(Component);
+}(_react.Component);
 
 SouTable.defaultProps = {
   tableData: [['City', 'Beijing', 'Shanghai', 'Guangzhou'], ['Temperature', '5', '22', '29'], ['Weather', 'Windy', 'Sunny', 'Rainy']],
@@ -1549,4 +1575,17 @@ SouTable.defaultProps = {
     console.log(data);
   }
 };
-export default SouTable;
+SouTable.propTypes = {
+  tableData: _propTypes.default.arrayOf(_propTypes.default.arrayOf(_propTypes.default.string)),
+  width: _propTypes.default.number,
+  // eslint-disable-line
+  height: _propTypes.default.number,
+  // eslint-disable-line
+  minTableCol: _propTypes.default.number,
+  minTableRow: _propTypes.default.number,
+  minCellWidth: _propTypes.default.number,
+  cellHeight: _propTypes.default.number,
+  getData: _propTypes.default.func
+};
+var _default = SouTable;
+exports.default = _default;

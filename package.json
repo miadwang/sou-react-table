@@ -1,6 +1,6 @@
 {
   "name": "sou-react-table",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "A spreadsheet component for React",
   "main": "dist/index.js",
   "engines": {
@@ -9,7 +9,7 @@
   "scripts": {
     "prepublishOnly": "npm run clean && npm run build",
     "clean": "rm -rf ./dist",
-    "build": "cross-env NODE_ENV=production ./node_modules/.bin/babel ./src --out-dir ./dist",
+    "build": "cross-env NODE_ENV=production babel ./src --out-dir ./dist",
     "lint": "eslint src/**",
     "lintfix": "eslint src/** --fix",
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -38,15 +38,14 @@
   "devDependencies": {
     "@babel/cli": "^7.1.5",
     "@babel/core": "^7.1.6",
-    "@babel/plugin-proposal-object-rest-spread": "^7.0.0",
-    "@babel/plugin-transform-react-jsx": "^7.1.6",
+    "@babel/preset-env": "^7.1.6",
+    "@babel/preset-react": "^7.0.0",
     "@storybook/addon-actions": "^4.0.6",
     "@storybook/addon-links": "^4.0.6",
     "@storybook/addons": "^4.0.6",
     "@storybook/react": "^4.0.6",
     "babel-eslint": "^10.0.1",
     "babel-loader": "^8.0.4",
-    "babel-preset-react-app": "^6.1.0",
     "cross-env": "^5.2.0",
     "eslint": "^5.9.0",
     "eslint-config-airbnb": "^17.1.0",

@@ -1,3 +1,10 @@
+## 0.1.6
+
+`2018-12-1`
+
+- Fix bug: wrong import in build file
+
+
 ## 0.1.5
 
 `2018-11-22`
